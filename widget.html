@@ -1,0 +1,193 @@
+<html>
+<head>
+<title>ADsafe Widget Structure</title>
+<style>
+h1, p {color: black; font-weight: normal;}
+b {color: darkblue; font-weight: normal;}
+h1 {font-size: 120%; text-align: center;}
+</style>
+</head>
+
+<body bgcolor="darkseagreen" text="black">
+
+<div style="float: left; width: 304;"> <a href="http://www.ADsafe.org/"><img src="adsafe.gif" border="2" width="300" height="147"></a><br>
+    <div style="color: dimgray; font-size: 200%; font-family: sans-serif; text-align: center;">ALPHA</div>
+    <div style="margin-top: 6px; padding: 1em; background-color: lemonchiffon; border: 2px solid black;">
+        <div>Widget Structure</div>
+        <div><a href="dom.html">DOM API</a></div>
+    <div>
+      Sample widgets: <a href="roman.html">Roman</a> <a href="bats.html">Bats</a> <a href="sudoku.html">Sudoku</a> <a href="http://www.JSLint.com/">JSLint</a>
+    </div>
+    </div>
+  </div>
+
+<div style="margin-left: 310px; padding: 1em; background-color: lemonchiffon; border: 2px solid black;">
+  <h1>ADsafe Widget Structure</h1>
+  <p>AD<b>safe</b> defines a safe subset of the JavaScript Programming Language,
+    and an interface that allows programs written in that language to usefully
+    interact with a specific subtree of of the HTML document. A programmed
+    HTML fragment is called a <i>widget</i>.</p>
+  <p>A widget is a fragment of HTML with some script. That script is able
+    to manipulate the HTML fragment, but is unable to manipulate any other
+    part of the document. All <code>&lt;input&gt;</code> tags must contain
+    an <code>autocomplete=&quot;off&quot;</code> attribute. </p>
+      <p>This is the simplest widget pattern allowed by AD<b>safe</b>:</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">
+
+    <pre>&lt;div id=&quot;<var>WIDGETNAME_</var>&quot;&gt;
+   <i>html markup required by the widget</i>
+&lt;script&gt;
+ADSAFE.go(&quot;<var>WIDGETNAME_</var>&quot;, function (dom) {
+    &quot;use strict&quot;;
+
+// This is where the code for the widget is placed. It can access
+// the document through the dom parameter, allowing it indirect
+// access to html elements, allowing it to change content, styling,
+// and behavior.
+
+});
+&lt;/script&gt;
+&lt;/div&gt;</pre>
+</div>
+
+  <p>It uses the <a href="http://www.JSLint.com/">JSLint</a> option <code>{adsafe: true, fragment: true}</code>.
+    The widget must be wrapped in a <code>&lt;div&gt;</code> element. The
+    <code>&lt;div&gt;</code> element must have an <code>id</code>. The <code>id</code>
+    must contain only upper case ASCII letters with a trailing <code>_</code>
+    character. It is the page builder's responsibility to assure that the
+    <code>id</code> of the <code>&lt;div&gt;</code> is unique to the page.
+  </p>
+  <p>The other elements may have <code>id</code>s Those <code>id</code>s
+    must be in all uppercase and have a prefix that matches the widget <code>id</code>
+    . For example,</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">
+      <pre>&lt;div id=&quot;KODA_&quot;&gt;
+&lt;p id=&quot;KODA_BOSANDA&quot;&gt;</pre>
+</div>
+      <p>The <code>ADSAFE.go</code> method gives the script access to a
+        <var>dom</var> object that provides a limited interface to the widget's
+        DOM tree. </p>
+      <p>Another AD<b>safe</b> pattern allows the widget to load approved
+        JavaScript libraries. All of the script tags in a <code>&lt;div&gt;</code>
+        must be at the top level of the <code>&lt;div&gt;</code>.</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">
+
+    <pre>&lt;div id=&quot;<var>WIDGETNAME_</var>&quot;&gt;
+    <i>html markup required by the widget</i>
+&lt;script&gt;
+ADSAFE.id(&quot;<var>WIDGETNAME_</var>&quot;);
+&lt;/script&gt;
+&lt;script src=&quot;<var>AD<b>safe</b> approved url</var>&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+ADSAFE.go(&quot;<var>WIDGETNAME_</var>&quot;, function (dom, lib) {
+    &quot;use strict&quot;;
+
+// This is where the code for the widget is placed. It can access
+// the document through the dom parameter, allowing it indirect
+// access to html elements, allowing it to change content, styling,
+// and behavior.
+
+// Each library file can give itself a <var>name</var>. This script can access
+// the library file as lib.<var>name</var>.
+
+});
+&lt;/script&gt;
+&lt;/div&gt;</pre>
+</div>
+
+
+  <p>It uses the <a href="http://www.JSLint.com/">JSLint</a> option <code>{adsafe: true, fragment: true}</code>.
+  </p>
+  <p>The services provided through <code>ADSAFE</code> methods can include
+    communication with the network and manipulation of the DOM. The <code>ADSAFE</code>
+    methods are provided by the page to give the widgets restricted access
+    to essential services. It is not safe to give a widget direct access
+    to any DOM node because access to any DOM node gives access to the <code>document</code>
+    object, which gives unrestricted access to the entire tree and to the
+    network. It is safe to give a widget indirect access to the DOM through
+    methods that assure that no capability leakage occurs.</p>
+      <p>In order for a widget to be approved by AD<b>safe</b>, it may not
+        make use of any global variables except the <code>ADSAFE</code>
+        object (or other global variables that a site may designate). It
+        may not define any global variables, and it may not contain any
+        code that could give the guest code access to the <code>window</code>
+        object or <code>document</code> object.</p>
+      <p>All AD<b>safe</b> approved library files must conform to this pattern:</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">
+
+    <pre>ADSAFE.lib(&quot;<var>name</var>&quot;, function (lib) {
+    &quot;use strict&quot;;
+
+// This is where the code for the library module is placed. It cannot
+// access the document unless the guest code passes the dom parameter
+// to its methods. The optional lib parameter gives it access to the
+// currently loaded libraries.
+
+    return {
+
+// Return an object containing the library module's privileged methods.
+// The script can get access to this object at lib.<var>name</var>.
+
+    };
+});
+</pre>
+</div>
+
+
+  <p>It uses the <a href="http://www.JSLint.com/">JSLint</a> option <code>{adsafe: true, fragment: false}</code>.
+    A library file contains a call to <code>ADSAFE.lib</code>, which allows
+    the file to identify itself and to pass an object to the guest code.</p>
+  <p><code>ADSAFE.lib</code> can only be called at the top of a script
+        file. It cannot be called from any other location. Calls to <code>ADSAFE.lib</code>
+        must occur after the call to <code>ADSAFE.id</code>, but before
+        the call to <code>ADSAFE.go</code>.</p>
+      <p><code>ADSAFE.id</code> can only be called at the top of the widget's
+        first script. It cannot be called from any other location.</p>
+      <p><code>ADSAFE.go</code> can only be called from an inline script.
+        It cannot be called from a file. It can only be called once. It
+        must be called from the last script block in the fragment.</p>
+      <p>The <code>id</code> of the widget's containing <code>&lt;div&gt;</code>
+        must exactly match the <var>id</var> passed to the <code>ADSAFE.id</code>
+        and <code>ADSAFE.go</code> methods.</p>
+
+  <p>The AD<b>safe</b> verifier is able to statically enforce all of these
+    restrictions.</p>
+  <p>If the page wants to modify the <var>dom</var> and <var>lib</var> objects
+    and the  bunch <var>prototype</var> object that are given to the widget,
+    it pass a function to the <code>ADSAFE._intercept</code> method. The function  will be
+    called before the function that is supplied with <code>ADSAFE.go</code>.
+    This can be used to add or remove or modify the methods that are provided
+    to the widget. </p>
+  <div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">
+    <pre>ADSAFE._intercept(function (id, dom, lib, bunch) {
+    &quot;use strict&quot;;
+
+// Do not allow widgets to set position to absolute.
+// This is to prevent phishing and other annoyances.
+
+    var style = bunch.prototype.style;
+
+    bunch.prototype.style = function (name, value) {
+        if (name.toLowerCase() === 'position' &&
+                value.toLowerCase() === 'absolute') {
+            throw {
+                name: 'error',
+                message: 'position:absolute is not allowed'
+            }
+        }
+        return style.apply(this, arguments);
+    };
+});</pre>
+  </div>
+
+  <p>A page could allow inter-widget communication by providing communication
+      methods to the <var>lib</var> object. A page could allow a method
+      to change the <code>src</code> of a node.</p>
+  <p>The file <a href="adsafe.js"><code>adsafe.js</code></a> contains the
+    runtime component that provides the <code>ADSAFE</code> object, and should be loaded before all interceptors and widgets. The
+    file <a href="template.html">template.html</a> contains the template
+    for a widget. The file <a href="template.js">template.js</a> contains
+    the template for a JavaScript library file.</p>
+  </div>
+</body>
+</html>

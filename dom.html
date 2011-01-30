@@ -1,0 +1,874 @@
+<html>
+<head>
+<title>ADsafe DOM API</title>
+<style>
+table, th, td, caption {border: 1px solid black;}
+td {background-color: white; padding-left: 1em; padding-right: 1em;}
+th {background-color: thistle;}
+table {background-color: navajowhite;}
+caption {background-color: navajowhite; margin-bottom: 2px; font-weight: bold;}
+h1, p {color: black; font-weight: normal;}
+b {color: darkblue; font-weight: normal;}
+h1 {font-size: 120%; text-align: center;}
+pre {margin-left: 1em;}
+</style>
+</head>
+
+<body bgcolor="darkseagreen" text="black">
+<div style="float: left; width: 304;"> <a href="http://www.ADsafe.org/"><img src="adsafe.gif" border="2" width="300" height="147"></a><br>
+	<div style="color: dimgray; font-size: 200%; font-family: sans-serif; text-align: center;">ALPHA</div>
+    <div style="margin-top: 6px; padding: 1em; background-color: lemonchiffon; border: 2px solid black;">
+        <div><a href="widget.html">Widget Structure</a></div>
+        <div>DOM API</div>
+    <div>Sample widgets: <a href="roman.html">Roman</a> <a href="bats.html">Bats</a> <a href="sudoku.html">Sudoku</a> <a href="http://www.JSLint.com/">JSLint</a></div>
+    </div>
+  </div>
+  <div style="margin-left: 310px; padding: 1em; background-color: lemonchiffon; border: 2px solid black;">
+      <h1>AD<b>safe</b> DOM API</h1>
+      <p>AD<b>safe</b> provides an application programming interface to
+        the Document Object Model. It improves the security, portability,
+        and reliability of the DOM.</p>
+      <p>This allows the widget program to affect the structure, content,
+        appearance, and behavior of the widget in a convenient way, while
+        also constraining the program so that it cannot do bad things.</p>
+      <p>The <code>ADSAFE.go</code> method provides access to the <var>dom</var>
+        object. The <var>dom</var> object is the root of the widget's document
+        tree. The widget's document tree is a subtree of the page's complete
+        document tree. AD<b>safe</b> limits all interactions to the subtree.
+        It is not possible to get back to the <code>document</code> root.</p>
+      <h1>Query</h1>
+      <p>The <var>dom</var> object has a <code>q</code> (for <var>query</var>)
+        method. It takes a query string that returns a <b>bunch</b> object
+        that provides access to zero or more nodes selected from the subtree.</p>
+      <p>The query language somewhat resembles CSS selectors. A query is
+        a sequence of one or more selectors. There are two kinds of selectors:
+        hunters and peckers.</p>
+      <ul>
+        
+    <li>The hunters are <code>#</code><var>id</var>, <var>tagName</var>, 
+      <code>+</code><var>tagName</var>, <code>&gt;</code><var>tagName</var>, 
+      <code>*</code>, and <code>/</code>. They descend into the tree, finding 
+      a new selection of nodes to replace the current selection of nodes. 
+      The <code>#</code><var>id</var> hunter is the most efficient. The <code>*</code> 
+      hunter is the least efficient. The hunters shift attention from the 
+      root to nodes within the subtree.</li>
+        
+    <li>The peckers are <code>&amp;</code><var>name</var>, <code>_</code><var>type</var>, 
+      <code>.</code><var>class</var>, <code>[</code> <var>attribute</var> 
+      ... <code>]</code>, and <code>:</code><var>option</var>. They remove 
+      nodes from the current selection of nodes that do not match somehow. 
+      The peckers reduce the set of nodes currently under consideration.</li>
+      </ul>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">	  
+      
+    <table border="1" cols=2>
+      <caption>Query Selectors</caption>
+      <tbody> 
+      <tr> 
+        <th>Hunter Selector</th>
+        <th>Meaning</th>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>#</code> <var>id</var></td>
+        <td valign="top">Select the descendent node that has an <code>id</code> 
+          that matches the <var>id</var>. AD<b>safe</b> requires that every 
+          <code>id</code> be unique. This selector only makes sense in the 
+          first position.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><var>tagName</var></td>
+        <td valign="top">Select all of the descendent nodes that have a 
+          <var>tagName</var> that matches. <var>dom</var><code>.q('p')</code> 
+          matches all <code>&lt;p&gt;</code> elements. </td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>+</code> <var>tagName</var></td>
+        <td valign="top">Select all of the immediate siblings that have 
+          a <var>tagName</var> that matches.</td>
+      </tr><tr> 
+        <td valign="top" nowrap><code>&gt;</code> <var>tagName</var></td>
+        <td valign="top">Select all of the immediate children that have 
+          a <var>tagName</var> that matches.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>/</code></td>
+        <td valign="top">Select all of the immediate child nodes.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>*</code></td>
+        <td valign="top">Select all of the descendent nodes. After matching 
+          <code>*</code>, only peckers may be matched.</td>
+      </tr>
+      <tr> 
+        <th>Pecker Selector</th>
+        <th>Meaning</th>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>.</code> <var>class</var></td>
+        <td valign="top">Keep the nodes that have a <code>class</code> attribute 
+          that matches the <var>class</var>. Same as <code>[class~=</code><var>class</var><code>]</code>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>&amp;</code> <var>name</var></td>
+        <td valign="top">Keep the nodes that have a <code>name</code> attribute 
+          that matches the <var>name</var>. Same as <code>[name=</code><var>name</var><code>]</code>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>_</code> <var>type</var></td>
+        <td valign="top">Keep the nodes that have a <code>type</code> attribute 
+          that matches the <var>type</var>. Same as <code>[type=</code><var>type</var><code>]</code>. 
+          This is usually used with <code>&lt;input&gt;</code> and <code>&lt;button&gt;</code> 
+          tags. It can also be used with <code>&lt;link&gt;</code>, <code>&lt;object&gt;</code>, 
+          <code>&lt;param&gt;</code>, <code>&lt;ol&gt;</code>, <code>&lt;ul&gt;</code>, 
+          <code>&lt;li&gt;</code>, and <code>&lt;style&gt;</code>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>[</code> <var>attribute</var> <code>]</code></td>
+        <td valign="top">Keep the nodes that have the named <var>attribute</var>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>[</code> <var>attribute</var> <code>=</code> 
+          <var>value</var> <code>]</code></td>
+        <td valign="top">Keep the nodes with the named <var>attribute</var> 
+          that matches the <var>value</var>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>[</code> <var>attribute</var> <code>!=</code> 
+          <var>value</var> <code>]</code></td>
+        <td valign="top">Keep the nodes with the named <var>attribute</var> 
+          that do not match the <var>value</var>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>[</code> <var>attribute</var> <code>*=</code> 
+          <var>value</var> <code>]</code></td>
+        <td valign="top">Keep the nodes with the named <var>attribute</var> 
+          that contain the <var>value</var>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>[</code> <var>attribute</var> <code>^=</code> 
+          <var>value</var> <code>]</code></td>
+        <td valign="top">Keep the nodes with the named <var>attribute</var> 
+          that start with the <var>value</var>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>[</code> <var>attribute</var> <code>$=</code> 
+          <var>value</var> <code>]</code></td>
+        <td valign="top">Keep the nodes with the named <var>attribute</var> 
+          that end with the <var>value</var>.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>[</code> <var>attribute</var> <code>~=</code> 
+          <var>value</var> <code>]</code></td>
+        <td valign="top">Keep the nodes with the named <var>attribute</var> 
+          that contain the <var>value</var> as an element in a space-separated 
+          list.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>[</code> <var>attribute</var> <code>|=</code> 
+          <var>value</var> <code>]</code></td>
+        <td valign="top">Keep the nodes with the named <var>attribute</var> 
+          that contain the <var>value</var> as an element in a minus-separated 
+          list.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: first</code></td>
+        <td valign="top">Keep the first node in the bunch.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: rest</code></td>
+        <td valign="top">Keep all of the nodes in the bunch except the first.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: even</code></td>
+        <td valign="top">Keep half of the nodes in the bunch, starting with 
+          the second.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: odd</code></td>
+        <td valign="top">Keep half of the nodes in the bunch, starting with 
+          the first.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: hidden</code></td>
+        <td valign="top">Keep nodes that are currently hidden.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: visible</code></td>
+        <td valign="top">Keep nodes that are currently visible.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: disabled</code></td>
+        <td valign="top">Keep nodes that are currently disabled.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: enabled</code></td>
+        <td valign="top">Keep nodes that are currently enabled.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: checked</code></td>
+        <td valign="top">Keep nodes that are currently checked.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: unchecked</code></td>
+        <td valign="top">Keep nodes that are not currently checked.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: focus</code></td>
+        <td valign="top">Keep the node that has focus.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: blur</code></td>
+        <td valign="top">Keep nodes that do not have focus.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: text</code></td>
+        <td valign="top">Keep text nodes.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: tag</code></td>
+        <td valign="top">Keep nodes that are not text nodes.</td>
+      </tr>
+      <tr> 
+        <td valign="top" nowrap><code>: trim</code></td>
+        <td valign="top">Keep nodes that are not useless text nodes.</td>
+      </tr>
+      </tbody> 
+    </table>
+</div>	  
+      <p>The <var>dom<code>.</code></var><code>q</code> method returns a
+        bunch object that represents zero or more nodes (depending on the
+        success of the query). A bunch has methods that can act upon all
+        of the nodes it represents. A bunch also has a <code>q</code> method,
+        so a bunch can be the root (or roots) of subtrees for additional
+        searches.</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">	  
+      <table>
+        <caption>Sample Queries</caption>
+        <tbody>
+        <tr>
+          <th>Query</th>
+          <th>Action</th>
+        </tr>
+        <tr>
+          
+        <td valign="top"><code>h1 + p * : text</code></td>
+        <td>Select the text in all of the paragraphs that immediately follow 
+          <code>H1</code> tags.</td>
+        </tr>
+        <tr>
+          
+        <td valign="top"><code>input_radio&amp;tikki:unchecked</code></td>
+          
+        <td>Select all radio buttons named <code>&quot;tikki&quot;</code> 
+          that are currently unchecked.</td>
+        </tr>
+        <tr>
+          
+        <td valign="top"><code>#KODA_FORM button_submit</code></td>
+          <td>Select the submit button that is a descendent of the element
+            with an <code>id</code> of <code>KODA_FORM</code>.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>p.topic.special</code></td>
+          
+        <td>Select all paragraph tags that  have a <code>class</code> 
+          attribute containing both <code>topic</code> and <code>special</code>.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>img [alt*=free]</code></td>
+          <td>Select all image tags that have an <code>alt</code> attribute
+            containing <code>free</code>.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>ol//:enabled:visible</code></td>
+          <td>Select all of the visible, enabled tags in an ordered list
+            that are grandchildren.</td>
+        </tr>
+        <tr>
+          
+        <td valign="top"><code>form input_hidden</code></td>
+          <td>Select all hidden fields within forms.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>form input:hidden</code></td>
+          <td>Select all input nodes that are hidden within forms.</td>
+        </tr>
+        <tr>
+          
+        <td valign="top"><code>*_text</code></td>
+          <td>Select all nodes with<code> type=&quot;text&quot;</code> attributes.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>*:text</code></td>
+          <td>Select all text nodes.</td>
+        </tr>
+        </tbody>
+      </table>
+</div>	  
+      <p>In addition to the <code>q</code> method, the <var>dom</var> object
+        has methods for making new HTML nodes and for altering the structure
+        of the document tree.</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">	  
+
+      
+    <table border="1">
+      <caption><var>dom</var> Methods</caption>
+      <tbody> 
+      <tr> 
+        <th>Method</th>
+        <th>Description</th>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.append(</code><var>bunch</var><code>)</code></td>
+        <td>Append the nodes in the <var>bunch</var> after the last element 
+          of the <var>dom</var> subtree. It returns the <var>dom</var> object.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.combine(</code><var>array</var><code>)</code></td>
+        <td>Combine an array of bunches into a single bunch. This is the 
+          opposite of the <var>bunch</var><code>.explode</code> method.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.count()</code></td>
+        <td>It returns the number 1.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.ephemeral(</code><var>bunch</var><code>)</code></td>
+        <td>Designate a bunch as ephemeral. The nodes will be removed when 
+          <code>ephemeral</code> is called again, or when the mouse button 
+          comes up, or when the escape key is pressed. This is a convenient 
+          way of getting rid of short-lived things like tips and popups. 
+          If <var>bunch</var> is <code>null</code>, then the current ephemeral 
+          nodes are removed.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.fragment(</code><code>)</code></td>
+        <td>Make a new HTML document fragment. A fragment can be a container 
+          of nodes. It disappears when appended to the live document tree.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.prepend(</code><var>bunch</var><code>)</code></td>
+        <td>Prepend the nodes in the <var>bunch</var> before the first element 
+          of the <var>dom</var> subtree. It returns the <var>dom</var> object.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.q(</code><var>query</var><code>)</code></td>
+        <td>Search the <var>dom</var> subtree. It returns a new bunch object 
+          containing the nodes that matched the query. It always returns 
+          a bunch object, even if the query selected no nodes. It will throw 
+          an exception if the query is not well formed or if the first selector 
+          is not a hunter.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.remove()</code></td>
+        <td valign="top">The widget's nodes are all removed from the document. 
+          At this point, the widget is useless.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.row(</code><var>array</var><code>)</code></td>
+        <td>Make a new <code>&lt;tr&gt;</code> node. Append to it a new 
+          <code>&lt;td&gt;</code> node wrapping a text node for each element 
+          of the <var>array</var>. It returns a bunch containing the <code>&lt;tr&gt;</code> 
+          node. The row will not be attached to the document tree.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.tag(</code><var>tagName</var><code><code>,</code> 
+          </code><var>type</var><code><code>,</code> </code><var>name</var><code>)</code></td>
+        <td>Make a new HTML node. If <var>tagName</var> is <code>'button'</code> 
+          or <code>'input'</code>, supply an extra parameter that determines 
+          the <var>type</var> of the element, such as <code>'submit'</code> 
+          or <code>'radio'</code>. A third parameter optionally names the 
+          node. This is used to group radio buttons together, so that at 
+          most one radio button in a group can be checked. It returns a 
+          bunch containing the one new node. It will not be attached to 
+          the document tree.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.text(</code><var>string</var><code>)</code></td>
+        <td>Make a new text node. It returns a bunch containing the text 
+          node. It will not be attached to the document tree. If the argument 
+          is an array of strings, it will return an array of text nodes.</td>
+      </tr>
+      </tbody> 
+    </table>
+</div>
+      <h1>Bunch Objects</h1>
+      <p>A bunch object is the result of calling the <code>q</code> method.</p>
+      <p>A bunch object has a large set of useful methods. These can be
+        broken into three groups: Those that set, those that get, and the
+        miscellaneous.</p>
+    <h1>Bunch Set Methods</h1>
+      <p>Every set method returns the bunch it was called with. This allows
+        a cascade style of programming, eliminating the need to make redundant
+        queries or to cache bunches.</p>
+      <p>Every set method acts on each of the nodes in the bunch. If the
+        bunch has no nodes, nothing happens. If the <var>value</var> parameter
+        is an array, then each node will get one value from the array. An
+        exception will be thrown if the <code>length</code> of the <var>value</var>
+        array is not the same as the number of nodes in the bunch.</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">	  
+
+      
+    <table border="1">
+      <caption>Bunch Set Methods</caption>
+      <tbody> 
+      <tr> 
+        <th>Method</th>
+        <th>Description</th>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.append(</code><var>appendees</var><code>)</code></td>
+        <td>Append the nodes in the bunch of <var>appendees</var> after 
+          the last element of each node. If the bunch contains more than 
+          one node, the <var>appendees</var> will be deeply cloned before 
+          each insertion. </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.blur(</code><code>)</code></td>
+        <td>Remove focus from the nodes. This only makes sense for <code>&lt;button&gt;</code>, 
+          <code>&lt;input&gt;</code>, and <code>&lt;textarea&gt;</code> 
+          nodes.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.check(</code><var>value</var><code>)</code></td>
+        <td>Set the check state for checkbox and radio nodes.</td>
+      </tr>      <tr> 
+        <td nowrap valign="top"><code>.class(</code><var>string</var><code>)</code><br><code>.klass(</code><var>string</var><code>)</code></td>
+        <td>Set the CSS class of the nodes. (The alternate spelling  
+          is to circumvent   a reserved word problem in the ECMAScript 
+          Standard, Third Edition.)</td>
+      </tr>
+
+      <tr> 
+        <td nowrap valign="top"><code>.each(</code><var>func</var><code>)</code></td>
+        <td>Pass each  node to a function. The <var>func</var> argument is a function that takes a  bunch argument.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.empty()</code></td>
+        <td>Remove all of the descendants from the nodes.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.enable(</code><var>boolean</var><code>)</code></td>
+        <td>Set the enable for the nodes.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.ephemeral()</code></td>
+        <td>Remove all the nodes when the escape key is pressed, or when 
+          the mouse buttom goes up, or when another bunch is declared ephemeral.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.fire(</code><var>event</var><code>)</code></td>
+        <td>Fire an event on every node in the bunch. The event value is 
+          either a string (<code>&quot;click&quot;</code>) or an object 
+          with an <code>event</code> property (<code>{event: &quot;click&quot;}</code>). 
+          Events fired by this method will notify only handlers registered 
+          with the <code>on</code> method, and will not trigger any browser 
+          actions.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.focus(</code><code>)</code></td>
+        <td>Give focus to the node. This throws an exception if the bunch 
+          does not hold exactly one node, or if this method is called at 
+          any time other than the handling of a <code>'click'</code> event 
+          unless ADsafe is able to determine that the widget already has 
+          focus. This only makes sense for <code>&lt;button&gt;</code>, 
+          <code>&lt;input&gt;</code>, and <code>&lt;textarea&gt;</code> 
+          nodes. </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.mark(</code><var>value</var><code>)</code></td>
+        <td>Set a mark on every tag node in the bunch.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.off(</code><var>eventName</var><code>,</code> 
+          <var>func</var><code>)</code></td>
+        <td>Remove event handlers from nodes. <code>bunch.off()</code> removes 
+          all event handlers. <code>bunch.off('click')</code> removes all 
+          <code>onclick</code> handlers. <code>bunch.off('click', myclickhandler)</code> 
+          removes a particular <code>onclick</code> handler.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.on(</code><var>eventName</var><code>,</code> 
+          <var>func</var><code>)</code></td>
+        <td>Add an event handler to the nodes in the bunch. </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.prepend(</code><var>prependees</var><code>)</code></td>
+        <td>Prepend the nodes in the bunch of <var>prependees</var> before 
+          the first element of each node. If the bunch contains more than 
+          one node, the <var>prependees</var> will be deeply cloned before 
+          each insertion. </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.protect(</code><code>)</code></td>
+        <td>Protect the nodes. Once protected, a node's <code>getParent</code> 
+          method will throw instead of providing access to the node's parent. 
+          Events will not bubble up past a protected node. </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.select()</code></td>
+        <td>Give focus to the node and select its contents. This only makes 
+          sense for <code>&lt;input&gt;</code> and <code>&lt;textarea&gt;</code> 
+          nodes. It throws an exception if the bunch does not hold exactly 
+          one node.</td>
+      </tr>
+        <tr>
+        <td valign="top"><code>.selection(</code><var>string</var><code>)</code></td>
+          
+        <td>Replace the user-selected text in an <code>input_text</code> 
+          or <code>textarea</code> with the <var>string</var>. </td>
+        </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.style(</code><var>name</var><code>,</code> 
+          <var>value</var><code>)</code></td>
+        <td>Set the style element of the nodes to the <var>value</var>. Use the <var>name</var> 
+          <code>'float'</code>, not <code>'cssFloat'</code> or <code>'styleFloat'</code>, 
+          to set the <code>float</code> style property. </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.title(</code><var>value</var><code>)</code></td>
+        <td>Set the <code>title</code> attribute of the nodes to the <var>value</var>. </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.value(</code><var>value</var><code>)</code></td>
+        <td>Set the value for the nodes. For nodes that do not have <code>value</code> 
+          attributes, it removes all of the child nodes and appends a new 
+          text node. It does nothing to nodes that have a <code>type</code> of <code>"password"</code>.</td>
+      </tr>
+      </tbody> 
+    </table>
+</div>
+      <h1>Bunch Get Methods</h1>
+      <p>The <code>get</code>- methods return <code>undefined</code> if the bunch contains
+        no nodes; or a single value (usually a string) if the bunch contains one or more nodes. The <code>get</code>-<code>s</code> methods return a possibly empty  array.</p>
+      <p>The <code>get</code>- and <code>get</code>-<code>s</code> methods do not cascade.</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">	  
+
+      
+    <table border="1">
+      <caption>Bunch Get Methods</caption>
+        <tbody>
+        <tr>
+          <th>Method</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          
+        <td valign="top"><code>.getCheck()</code><br>
+        <code>.getChecks()</code></td>
+          <td>Get the <code>checked</code> boolean for the nodes.</td>
+        </tr>
+        <tr>
+          
+        <td valign="top"><code>.getClass()</code><br><code>.getClasses()</code>
+        </td>
+          
+        <td>Get the <code>class</code> attributes for the nodes.</td>
+        </tr>
+        <tr>
+            
+            <td valign="top"><code>.getEnable()</code><br><code>.getEnables()</code></td>
+            
+            <td>Get the  <code>enable</code> boolean for the nodes.</td>
+        </tr><tr>
+          
+        <td valign="top"><code>.getMark()</code><br><code>.getMarks()</code></td>
+          <td>Get the mark from the nodes.</td>
+        </tr>
+        <tr>
+        <td valign="top"><code>.getName()</code><br><code>.getNames()</code></td>
+        <td>Get the <code>name</code> attribute of the nodes.</td>
+        </tr>
+        <tr>
+        <td valign="top"><code>.getOffsetHeight()</code><br><code>.getOffsetHeights()</code></td>
+          
+        <td>Get the <code>offsetHeight</code> of the nodes. The <code>offsetHeight</code> 
+          is the actual height, including the border and excluding the margin.</td>
+        </tr>
+        <tr>  
+        <td valign="top"><code>.getOffsetWidth()</code><br>
+        <code>.getOffsetWidths()</code></td>
+        <td>Get the <code>offsetWidth</code> of the nodes. The <code>offsetWidth</code> 
+          is the actual width, including the border and excluding the margin.</td>
+        </tr>
+        <tr>  
+        <td valign="top"><code>.getParent()</code></td>
+        <td>Get a bunch containing the parents of the nodes. This can produce 
+          duplicates if the query is over two or more siblings. An attempt 
+          to get the root node of the widget will throw an exception<code></code>.</td>
+        </tr>
+        <tr>
+        <td valign="top"><code>.getSelection(</code><code>)</code></td>
+          
+        <td>Get the user-selected text in an <code>input_text</code> or 
+          <code>textarea</code>. </td>
+        </tr>
+        <tr>
+        <td valign="top"><code>.getStyle(</code><var>name</var><code>)</code><br><code>.getStyles(</code><var>name</var><code>)</code></td>
+          
+        <td>Get the values of the named style element of the nodes. Use 
+          the <var>name</var> <code>'float'</code>, not <code>'cssFloat'</code> 
+          or <code>'styleFloat'</code>, to get the <code>float</code> style 
+          property. </td>
+        </tr>
+        <tr>
+        <td valign="top"><code>.getTagName()</code><br><code>.getTagNames()</code></td>
+          <td>Get the tag names for the nodes.</td>
+        </tr>
+        <tr>
+        <td valign="top"><code>.getTitle()</code><br><code>.getTitles()</code></td>
+        <td>Get the <code>title</code> attribute of the nodes.</td>
+        </tr>
+        <tr>
+        <td valign="top"><code>.getValue()</code><br>
+        <code>.getValues()</code></td>
+        <td>Get the <code>value</code> for the nodes. If a node does not 
+          have a value, but has a first child that is a text node, then 
+          the value of that text node will be obtained. It 
+          produces <code>undefined</code> from nodes that have 
+          a <code>type</code> of <code>"password"</code>.</td>
+        </tr>
+        </tbody>
+      </table>
+</div>
+      <h1>Bunch Miscellaneous Methods</h1>
+      
+  <p>There are 9 miscellaneous methods. The miscellaneous methods do not 
+    cascade.</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">	  
+
+      
+    <table border="1">
+      <caption>Bunch Miscellaneous Methods</caption>
+      <tbody> 
+      <tr> 
+        <th>Method</th>
+        <th>Description</th>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.clone(</code><var>deep</var><code>,</code> 
+          <var>number</var><code>)</code></td>
+        <td>Clone the nodes. It returns a new bunch of nodes that are not 
+          attached to the document tree. If the optional <var>deep</var> 
+          parameter is <code>true</code>, then all of the child nodes are 
+          also cloned. If the optional <var>number</var> parameter is a 
+          number, then an array will be returned containing <var>number</var> 
+          copies of the bunch.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.count()</code></td>
+        <td>Get the number of nodes in the bunch. (This count does not include 
+          the children.)</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.explode()</code></td>
+        <td>Get an array of bunches that each contain a single node for 
+          each node in the bunch. The <code>length</code> of the array will 
+          be the same as the <code>.count()</code> of the bunch. </td>
+      </tr><tr> 
+        <td valign="top"><code>.fragment()</code></td>
+        <td>Make a new HTML document fragment.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.q(</code><var>query</var><code>)</code></td>
+        <td>Search the subtrees of the nodes. It returns a new bunch object 
+          containing the nodes that matched the query. It always returns 
+          a bunch object, even if the query selected no nodes. It will throw 
+          an exception if the query is not well formed. A query never modifies 
+          the bunch; it produces a new bunch.</td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.remove()</code></td>
+        <td> 
+          <p>Remove the nodes. It removes nodes that have parents from their 
+            parents. </p>
+          <p>When a node is removed, its event handlers are removed, as 
+            well as the event handlers of all of its children.</p>
+        </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.replace(</code><var>replacement</var><code>)</code></td>
+        <td> 
+          <p>Replace the nodes. The optional <var>replacement</var> parameter 
+            is either a bunch object or an array of bunch objects. It does 
+            not replace nodes that do not have parents. It returns nothing. 
+            Replacement has no effect on nodes that do not have parents. 
+            If the replacement is empty, this bunch is removed. Otherwise, 
+            the bunch is replaced with all of the nodes in the replacement.</p>
+          <p>When a node is removed, its event handlers are removed, as 
+            well as the event handlers of all of its children.</p>
+        </td>
+      </tr>
+      <tr> 
+        <td nowrap valign="top"><code>.tag(</code><var>tagName</var><code><code>,</code> 
+          </code><var>type</var><code><code>,</code> </code><var>name</var><code>)</code></td>
+        <td>Make a new HTML node. If <var>tagName</var> is <code>'button'</code> 
+          or <code>'input'</code>, supply an extra parameter that determines 
+          the <var>type</var> of the element, such as <code>'submit'</code> 
+          or <code>'radio'</code>. A third parameter optionally names the 
+          node. This is used to group radio buttons together, so that at 
+          most one radio button in a group can be checked. It returns a 
+          bunch containing the one new node. It will not be attached to 
+          the document tree.</td>
+      </tr>
+      <tr> 
+        <td valign="top"><code>.text(</code><var>string</var><code>)</code></td>
+        <td>Make a new text node. It returns a bunch containing the text 
+          node. It will not be attached to the document tree. If the argument 
+          is an array of strings, it will return a bunch of text nodes.</td>
+      </tr>
+      </tbody> 
+    </table>
+</div>
+      <h1>Text Nodes</h1>
+      <p>The <code>q</code> method provides access to two kinds of nodes:
+        tag nodes (the stuff in HTML that is inside the angle brackets),
+        and text nodes (the stuff outside the angle brackets). </p>
+      
+  <p>The <code>*</code> and <code>/</code> selectors will select both tag 
+    and text nodes. The other hunter selectors select only tag nodes.</p>
+      <p>The <code>:text</code> selector keeps only text nodes.
+        The <code>:first</code>, <code>:rest</code> , and <code>:trim</code> selectors can keep
+        both text and tag nodes. All of the other peckers
+        keep only tag nodes.</p>
+      <p>The only methods that work on text nodes are <code>.value(</code><var>string</var><code>)</code>
+        that sets the text of the text node, <code>.getValue()</code> that
+        gets the text of the text node, <code>.replace(</code><var>replacers</var><code>)</code>,
+        <code>.remove()</code>, and <code>.clone(</code><code>)</code>.
+  </p>
+      <p>The other set methods ignore text nodes. The other
+        get methods return <code>undefined</code> from text
+        nodes.</p>
+
+      <h1>Events</h1>
+      
+  <p>Event handlers can be placed on an object with the <code>on</code> 
+    method. You can invent your own event types. These are the events that 
+    can be fired by the browser in response to user action:</p>
+<div style="position: relative; left: -4em; background-color: papayawhip; padding: 1em; border: 2px solid black;">	  
+		
+      <table border="1">
+        <caption>Browser events</caption>
+        <tbody>
+        <tr>
+          <td valign="top"><code>mouseover</code></td>
+          <td>The mouse has moved over a tag.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>mousedown</code></td>
+          <td>The mouse button goes down while over a tag.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>mouseup</code></td>
+          <td>The mouse button goes up while over a tag.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>mouseout</code></td>
+          <td>The mouse has left a tag.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>click</code></td>
+          <td>The mouse button came up before the mouse left the tag.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>doubleclick</code></td>
+          <td>The mouse button came up twice quickly before the mouse left
+            the tag.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>specialclick</code></td>
+          <td>The alternate mouse button came up before the mouse left the
+            tag.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>blur</code></td>
+          <td>The select, input, or textarea that had focus lost focus.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>focus</code></td>
+          <td>A select, input, or textarea was given focus by the user.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>keypress</code></td>
+          <td>The tag with focus receives a character from the keyboard.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>enterkey</code></td>
+          <td>The tag with focus receives the enter key character from the
+            keyboard.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>escapekey</code></td>
+          <td>The tag with focus receives the escape key character from
+            the keyboard.</td>
+        </tr>
+        <tr>
+          <td valign="top"><code>change</code></td>
+          
+        <td>On select, input and textarea tags: The value was changed by 
+          the user. This event does not bubble.</td>
+        </tr>
+        </tbody>
+      </table>
+</div>	  
+      
+  <p>You can fire any of these events yourself, but doing so will not trigger 
+    the browser's default action. Only the user can trigger the default 
+    action.</p>
+  <p>An event object could have any of these properties:</p>
+  <table border="1">
+    <tr> 
+      <th>Event Property Name</th>
+      <th>Meaning</th>
+    </tr>
+    <tr> 
+      <td valign="top"><code>altKey</code></td>
+      <td>A boolean that indicates the state of an alt key.</td>
+    </tr>
+    <tr> 
+      <td valign="top"><code> ctrlKey</code></td>
+      <td>A boolean that indicates the state of the control key.</td>
+    </tr>
+    <tr> 
+      <td valign="top"><code>key</code></td>
+      <td>The code of the pressed key.</td>
+    </tr>
+    <tr> 
+      <td valign="top"><code>shiftKey</code></td>
+      <td>A boolean that indicates the state of the shift key.</td>
+    </tr>
+    <tr> 
+      <td valign="top"><code>target</code></td>
+      <td>A bunch that gives access to the node that was the target of the 
+        event. </td>
+    </tr>
+    <tr> 
+      <td valign="top"><code>that</code></td>
+      <td>A bunch that gives access to the node that is handling the event. 
+        <code>that</code> could be the same as <code>target</code>, or it 
+        could be a parent or ancestor of the <code>target</code> if bubbling 
+        occurs.</td>
+    </tr>
+    <tr> 
+      <td valign="top"><code>type</code></td>
+      <td>A string containing the type of the event.</td>
+    </tr>
+    <tr> 
+      <td valign="top"><code>x</code></td>
+      <td>The horizontal position of the cursor relative to the target's 
+        container.</td>
+    </tr>
+    <tr> 
+      <td valign="top"><code>y</code></td>
+      <td>The vertical position of the cursor relative to the target's container.</td>
+    </tr>
+  </table>
+  <p>An event object may have a <code>bubble</code> method. Calling that 
+    method will cause the event to bubble up to the parent of <code>that</code> 
+    object.</p>
+  <p>An event object may have a <code>preventDefault</code> method. Calling 
+    that method will cause the cancellation of the browser's default action. 
+  </p>
+
+</div>
+</html>
