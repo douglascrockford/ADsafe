@@ -1,5 +1,5 @@
 // adsafe.js
-// 2011-01-29
+// 2011-02-06
 
 //    Public Domain.
 
@@ -1575,7 +1575,7 @@ var ADSAFE = (function () {
                     error('ADsafe: Bad combination.');
                 }
                 var b = array[0].___nodes___, i;
-                for (i = i; i < array.length; i += 1) {
+                for (i = 0; i < array.length; i += 1) {
                     b = b.concat(array[i].___nodes___);
                 }
                 return new Bunch(b);
