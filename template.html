@@ -24,7 +24,6 @@
     is required only if the widget will load library modules.
 
 <script>
-"use strict";
 ADSAFE.id("TEMPLATE_");
 </script>
 
@@ -35,16 +34,16 @@ ADSAFE.id("TEMPLATE_");
     ADSAFE.go starts the execution of the widget.
 
 <script>
-"use strict";
 ADSAFE.go("TEMPLATE_", function (dom, lib) {
+    "use strict";
 
 // This is where the code for the widget is placed. It can access
 // the document through the dom parameter, allowing it indirect
 // access to html elements, allowing it to change content, styling,
 // and behavior.
 
-// Each library file can give itself a name. This script can access
-// the library file as lib.name.
+// Each library file can give itself a NAME. This program can access
+// the library file as lib.NAME.
 
 });
 </script>

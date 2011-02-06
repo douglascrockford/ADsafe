@@ -13,7 +13,7 @@ ADSAFE.lib("template", function () {
     return {
 
 // Return an object containing the library module's privileged methods.
-// The script can get access to this object at lib.name.
+// The program can get access to this object at lib.template.
 
     };
 });
