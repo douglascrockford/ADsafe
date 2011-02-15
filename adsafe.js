@@ -242,7 +242,7 @@ var ADSAFE = (function () {
         return banned[name] ||
             ((typeof name !== 'number' || name < 0) &&
             (typeof name !== 'string'  || name.charAt(0) === '_' ||
-				name.slice(-1) === '_'     || name.charAt(0) === '-'));
+                name.slice(-1) === '_'     || name.charAt(0) === '-'));
     }
 
 
@@ -320,8 +320,8 @@ var ADSAFE = (function () {
             query = [],     // The resulting query array
             selector,
             qx = id ?
-				/^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/ :
-				/^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
+                /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/ :
+                /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
 
 // Loop over all of the selectors in the text.
 
@@ -578,7 +578,7 @@ var ADSAFE = (function () {
             if (typeof func === 'function') {
                 if (star) {
                     error("ADsafe: Query violation: *" + selector.op +
-						(selector.name || ''));
+                        (selector.name || ''));
                 }
                 result = [];
                 for (j = 0; j < nodes.length; j += 1) {
@@ -687,7 +687,7 @@ var ADSAFE = (function () {
                     allow_focus = true;
                     has_focus = the_target;
                     key = String.fromCharCode(the_actual_event.charCode ||
-						the_actual_event.keyCode);
+                        the_actual_event.keyCode);
                     switch (key) {
                     case '\u000d':
                     case '\u000a':
@@ -806,7 +806,7 @@ var ADSAFE = (function () {
                 if (appendage instanceof Array) {
                     if (appendage.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-							value.length);
+                            value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         rep = appendage[i].___nodes___;
@@ -820,10 +820,10 @@ var ADSAFE = (function () {
                         node = b[i];
                         for (j = 0; j < rep.length; j += 1) {
                             node.appendChild(
-								flag ?
-									rep[j].cloneNode(true) :
-									rep[j]
-							);
+                                flag ?
+                                    rep[j].cloneNode(true) :
+                                    rep[j]
+                            );
                         }
                         flag = true;
                     }
@@ -848,7 +848,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-							value.length);
+                            value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -872,7 +872,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-							value.length);
+                            value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         if (/url/i.test(string_check(value[i]))) {
@@ -917,7 +917,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-							value.length);
+                            value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -943,7 +943,7 @@ var ADSAFE = (function () {
                 if (enable instanceof Array) {
                     if (enable.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-							enable.length);
+                            enable.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1147,8 +1147,8 @@ var ADSAFE = (function () {
                     node = b[i];
                     if (node.tagName) {
                         s = name !== 'float' ? getStyleObject(node)[name] :
-							getStyleObject(node).cssFloat ||
-							getStyleObject(node).styleFloat;
+                            getStyleObject(node).cssFloat ||
+                            getStyleObject(node).styleFloat;
                         if (typeof s === 'string') {
                             a[i] = s;
                         }
@@ -1208,7 +1208,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-							value.length);
+                            value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1526,7 +1526,7 @@ var ADSAFE = (function () {
                                     }
                                     node.appendChild(document.createTextNode(
                                         String(value[i])
-									));
+                                    ));
                                 }
                             }
                         } else if (node.nodeName === '#text') {
@@ -1668,9 +1668,9 @@ var ADSAFE = (function () {
             root.addEventListener('keypress', dom_event, true);
         } else {
             root.onfocusin       = root.onfocusout  = root.onmouseout  =
-				root.onmousedown = root.onmousemove = root.onmouseup   =
-				root.onmouseover = root.onclick     = root.ondblclick  =
-				root.onkeypress  = dom_event;
+                root.onmousedown = root.onmousemove = root.onmouseup   =
+                root.onmouseover = root.onclick     = root.ondblclick  =
+                root.onkeypress  = dom_event;
         }
         return [dom, Bunch.prototype];
     }
