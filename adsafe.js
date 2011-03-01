@@ -1,5 +1,5 @@
 // adsafe.js
-// 2011-02-06
+// 2011-02-28
 
 //    Public Domain.
 
@@ -42,7 +42,7 @@
     getMark, getMarks, getName, getNames, getOffsetHeight, getOffsetHeights,
     getOffsetWidth, getOffsetWidths, getParent, getSelection, getStyle,
     getStyles, getTagName, getTagNames, getTitle, getTitles, getValue,
-    getValues, go, h1, h2, h3, h4, h5, h6, hasOwnProperty, hr, i, id, img,
+    getValues, go, h1, h2, h3, h4, h5, h6, has, hasOwnProperty, hr, i, id, img,
     inRange, indexOf, input, ins, insertBefore, isArray, kbd, key, keyCode,
     klass, label, later, legend, length, li, lib, log, map, mark, menu,
     message, name, nextSibling, nodeName, nodeValue, object, off,
@@ -1759,6 +1759,13 @@ var ADSAFE = (function () {
             }
             root = null;
             adsafe_lib = null;
+        },
+
+//  ADSAFE.has returns true if the object contains an own property with the
+//  given name.
+
+        has: function (object, name) {
+            return owns(object, name);
         },
 
 //  ADSAFE.id allows a guest widget to indicate that it wants to load
