@@ -1,5 +1,5 @@
 // adsafe.js
-// 2011-02-28
+// 2011-04-18
 
 //    Public Domain.
 
@@ -22,7 +22,7 @@
 
 /*jslint browser: true, devel: true, nomen: false, strict: true */
 
-/*members "", "#", "&", "*", "+", ".", "\/", ":blur", ":checked",
+/*properties "", "#", "&", "*", "+", ".", "\/", ":blur", ":checked",
     ":disabled", ":enabled", ":even", ":focus", ":hidden", ":odd", ":tag",
     ":text", ":trim", ":unchecked", ":visible", ">", "[", "[!=", "[$=",
     "[*=", "[=", "[^=", "[|=", "[~=", _, "___ on ___", "___adsafe root___",
@@ -1027,7 +1027,7 @@ var ADSAFE = (function () {
             focus: function () {
                 reject_global(this);
                 var b = this.___nodes___;
-                if (b.length === 1 && allow_focus) {
+                if (b.length > 0 && allow_focus) {
                     has_focus = b[0].focus();
                     return this;
                 }
@@ -1368,7 +1368,7 @@ var ADSAFE = (function () {
             select: function () {
                 reject_global(this);
                 var b = this.___nodes___;
-                if (b.length !== 1 || !allow_focus) {
+                if (b.length < 1 || !allow_focus) {
                     error();
                 }
                 b[0].focus();
@@ -1683,9 +1683,14 @@ var ADSAFE = (function () {
 
     return {
 
-        create: typeof Object.create === 'function' ? Object.create : function (o) {
-            F.prototype = typeof o === 'object' && o ? o : Object.prototype;
-            return new F();
+        create: function (o) {
+            reject_global(o);
+            if (Object.hasOwnProperty('create')) {
+                return Object.create(o);
+            } else {
+                F.prototype = typeof o === 'object' && o ? o : Object.prototype;
+                return new F();
+            }
         },
 
 //  ADSAFE.get retrieves a value from an object.
