@@ -1,5 +1,5 @@
 // adsafe.js
-// 2011-04-19
+// 2011-04-20
 
 //    Public Domain.
 
@@ -75,7 +75,7 @@ var ADSAFE = (function () {
             constructor     : true,
             'eval'          : true,
             prototype       : true,
-            stack            : true,
+            stack           : true,
             unwatch         : true,
             valueOf         : true,
             watch           : true
@@ -190,7 +190,7 @@ var ADSAFE = (function () {
 
 //    Some of JavaScript's implicit string conversions can grant extraordinary
 //    powers to untrusted code. So we use the string_check function to prevent
-//  such abuses.
+//    such abuses.
 
     function string_check(string) {
         if (typeof string !== 'string') {
@@ -248,19 +248,17 @@ var ADSAFE = (function () {
 
 //  The reject functions enforce the restriction on property names.
 //  reject_property allows access only to objects and arrays. It does not allow
-//  use of the banned names, or names that are not strings or positive numbers,
-//  or strings that start or end with _ or strings that start with -.
+//  use of the banned names, or names that are not strings and not numbers,
+//  or strings that start or end with _.
 
     function reject_name(name) {
-        return banned[name] ||
-            ((typeof name !== 'number' || name < 0) &&
-            (typeof name !== 'string'  || name.charAt(0) === '_' ||
-                name.slice(-1) === '_'     || name.charAt(0) === '-'));
+        return typeof name !== 'number' && (typeof name !== 'string' ||
+            banned[name] || name.charAt(0) === '_' || name.slice(-1) === '_');
     }
 
 
     function reject_property(object, name) {
-        return typeof object !== 'object'  || reject_name(name);
+        return typeof object !== 'object' || reject_name(name);
     }
 
 
