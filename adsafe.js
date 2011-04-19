@@ -1,5 +1,5 @@
 // adsafe.js
-// 2011-04-18
+// 2011-04-19
 
 //    Public Domain.
 
@@ -26,37 +26,37 @@
     ":disabled", ":enabled", ":even", ":focus", ":hidden", ":odd", ":tag",
     ":text", ":trim", ":unchecked", ":visible", ">", "[", "[!=", "[$=",
     "[*=", "[=", "[^=", "[|=", "[~=", _, "___ on ___", "___adsafe root___",
-    ___nodes___, ___star___, "_adsafe mark_", _intercept, a, abbr, acronym,
-    addEventListener, address, altKey, append, appendChild, apply, area,
-    arguments, autocomplete, b, bdo, big, blockquote, blur, br, bubble,
-    button, call, callee, caller, cancelBubble, canvas, caption, center,
-    change, charAt, charCode, check, checked, childNodes, cite, class,
-    className, clientX, clientY, clone, cloneNode, code, col, colgroup,
-    combine, concat, console, constructor, count, create,
-    createDocumentFragment, createElement, createRange, createTextNode,
-    createTextRange, cssFloat, ctrlKey, currentStyle, dd, defaultView, del,
-    dfn, dir, disabled, div, dl, dt, each, em, empty, enable, ephemeral,
-    eval, exec, expand, explode, fieldset, fire, firstChild, focus, font,
-    form, fragment, fromCharCode, get, getCheck, getChecks, getClass,
-    getClasses, getComputedStyle, getElementById, getElementsByTagName,
-    getMark, getMarks, getName, getNames, getOffsetHeight, getOffsetHeights,
-    getOffsetWidth, getOffsetWidths, getParent, getSelection, getStyle,
-    getStyles, getTagName, getTagNames, getTitle, getTitles, getValue,
-    getValues, go, h1, h2, h3, h4, h5, h6, has, hasOwnProperty, hr, i, id, img,
-    inRange, indexOf, input, ins, insertBefore, isArray, kbd, key, keyCode,
-    klass, label, later, legend, length, li, lib, log, map, mark, menu,
-    message, name, nextSibling, nodeName, nodeValue, object, off,
-    offsetHeight, offsetWidth, ol, on, onclick, ondblclick, onfocusin,
-    onfocusout, onkeypress, onmousedown, onmousemove, onmouseout,
-    onmouseover, onmouseup, op, optgroup, option, p, parent, parentNode,
-    postError, pre, prepend, preventDefault, protect, prototype, push, q,
-    remove, removeChild, removeElement, replace, replaceChild, returnValue,
-    row, samp, select, selection, selectionEnd, selectionStart, set,
-    shiftKey, slice, small, span, srcElement, stack, stopPropagation,
-    strong, style, styleFloat, sub, sup, table, tag, tagName, target, tbody,
-    td, test, text, textarea, tfoot, th, that, thead, title, toLowerCase,
-    toString, toUpperCase, tr, tt, type, u, ul, unwatch, value, valueOf,
-    var, visibility, watch, window, writeln, x, y
+    ___nodes___, ___star___, __defineGetter__, "_adsafe mark_", _intercept,
+    a, abbr, acronym, addEventListener, address, altKey, append,
+    appendChild, apply, area, arguments, autocomplete, b, bdo, big,
+    blockquote, blur, br, bubble, button, call, callee, caller,
+    cancelBubble, canvas, caption, center, change, charAt, charCode, check,
+    checked, childNodes, cite, class, className, clientX, clientY, clone,
+    cloneNode, code, col, colgroup, combine, concat, console, constructor,
+    count, create, createDocumentFragment, createElement, createRange,
+    createTextNode, createTextRange, cssFloat, ctrlKey, currentStyle, dd,
+    defaultView, del, dfn, dir, disabled, div, dl, dt, each, em, empty,
+    enable, ephemeral, eval, exec, expand, explode, fieldset, fire,
+    firstChild, focus, font, form, fragment, fromCharCode, get, getCheck,
+    getChecks, getClass, getClasses, getComputedStyle, getElementById,
+    getElementsByTagName, getMark, getMarks, getName, getNames,
+    getOffsetHeight, getOffsetHeights, getOffsetWidth, getOffsetWidths,
+    getParent, getSelection, getStyle, getStyles, getTagName, getTagNames,
+    getTitle, getTitles, getValue, getValues, go, h1, h2, h3, h4, h5, h6,
+    has, hasOwnProperty, hr, i, id, img, inRange, indexOf, input, ins,
+    insertBefore, isArray, kbd, key, keyCode, klass, label, later, legend,
+    length, li, lib, log, map, mark, menu, message, name, nextSibling,
+    nodeName, nodeValue, object, off, offsetHeight, offsetWidth, ol, on,
+    onclick, ondblclick, onfocusin, onfocusout, onkeypress, onmousedown,
+    onmousemove, onmouseout, onmouseover, onmouseup, op, optgroup, option,
+    p, parent, parentNode, postError, pre, prepend, preventDefault, protect,
+    prototype, push, q, remove, removeChild, removeElement, replace,
+    replaceChild, returnValue, row, samp, select, selection, selectionEnd,
+    selectionStart, set, shiftKey, slice, small, span, srcElement, stack,
+    stopPropagation, strong, style, styleFloat, sub, sup, table, tag,
+    tagName, target, tbody, td, test, text, textarea, tfoot, th, that,
+    thead, title, toLowerCase, toString, toUpperCase, tr, tt, type, u, ul,
+    unwatch, value, valueOf, var, visibility, watch, window, writeln, x, y
 */
 
 var ADSAFE = (function () {
@@ -231,6 +231,19 @@ var ADSAFE = (function () {
     ('slice')
     ('some')
     ('sort'));
+
+//  Firefox also leaked some internal state through negative subscripts of
+//  functions. This plugs the holes.
+
+    if (Function.__defineGetter__) {
+        (function (p, f) {
+            p.__defineGetter__('-1', f);
+            p.__defineGetter__('-3', f);
+            p.__defineGetter__('-6', f);
+        }(Function.prototype, function () {
+            return null;
+        }));
+    }
 
 
 //  The reject functions enforce the restriction on property names.
