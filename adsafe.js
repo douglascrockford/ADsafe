@@ -1,5 +1,5 @@
 // adsafe.js
-// 2011-04-20
+// 2011-04-21
 
 //    Public Domain.
 
@@ -797,7 +797,7 @@ var ADSAFE = (function () {
                 return;
             };
 
-// Mark the node as a root. This prevents event bubbling from propogating
+// Mark the node as a root. This prevents event bubbling from propagating
 // past it.
 
         root['___adsafe root___'] = '___adsafe root___';
