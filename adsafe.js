@@ -208,34 +208,34 @@ var ADSAFE = (function () {
             Object.prototype.hasOwnProperty.call(object, string_check(string));
     }
 
+    if (Function.__defineGetter__) {
 
 //  Firefox implemented some of its array methods carelessly. If a method is
 //  called as a function it returns the global object. ADsafe cannot tolerate
-//  that, so we wrap the methods to make them safer and slower.
+//  that, so we must wrap the methods to make them safer and slower.
 
-    (function mozilla(name) {
-        var method = Array.prototype[name];
-        Array.prototype[name] = function () {
-            return !this || this.window ? error() : method.apply(this, arguments);
-        };
-        return mozilla;
-    }
-    ('concat')
-    ('every')
-    ('filter')
-    ('forEach')
-    ('map')
-    ('reduce')
-    ('reduceRight')
-    ('reverse')
-    ('slice')
-    ('some')
-    ('sort'));
+        (function mozilla(name) {
+            var method = Array.prototype[name];
+            Array.prototype[name] = function () {
+                return !this || this.window ? error() : method.apply(this, arguments);
+            };
+            return mozilla;
+        }
+        ('concat')
+        ('every')
+        ('filter')
+        ('forEach')
+        ('map')
+        ('reduce')
+        ('reduceRight')
+        ('reverse')
+        ('slice')
+        ('some')
+        ('sort'));
 
 //  Firefox also leaked some internal state through negative subscripts of
 //  functions. This plugs the holes.
 
-    if (Function.__defineGetter__) {
         (function (p, f) {
             p.__defineGetter__('-1', f);
             p.__defineGetter__('-3', f);
@@ -423,12 +423,20 @@ var ADSAFE = (function () {
 // These functions implement the hunter behaviors.
 
         '': function (node) {
-            var e = node.getElementsByTagName(name), i;
-            for (i = 0; i < 1000; i += 1) {
-                if (e[i]) {
-                    result.push(e[i]);
-                } else {
-                    break;
+            var array, nodelist = node.getElementsByTagName(name), i, length;
+
+// getElementsByTagName produces a nodeList, which is one of the world's most
+// inefficient data structures. It is so slow that JavaScript's pseudo arrays
+// look terrifically swift by comparison. So we do the conversion. This is
+// easily done on some browsers, less easily on others.
+
+            try {
+                array = Array.prototype.slice.call(nodelist, 0);
+                result = result.length ? result.concat(array) : array;
+            } catch (ie) {
+                length = nodelist.length;
+                for (i = 0; i < length; i += 1) {
+                    result.push(nodelist[i]);
                 }
             }
         },
@@ -459,9 +467,9 @@ var ADSAFE = (function () {
             }
         },
         '/': function (node) {
-            var e = node.childNodes, i;
-            for (i = 0; i < e.length; i += 1) {
-                result.push(e[i]);
+            var nodes = node.childNodes, i, length = nodes.length;
+            for (i = 0; i < length; i += 1) {
+                result.push(nodes[i]);
             }
         },
         '*': function (node) {
