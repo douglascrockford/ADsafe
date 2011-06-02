@@ -1,5 +1,5 @@
 // adsafe.js
-// 2011-04-21
+// 2011-05-31
 
 //    Public Domain.
 
@@ -460,7 +460,7 @@ var ADSAFE = (function () {
                 node = node.nextSibling;
             }
         },
-        '#': function (node) {
+        '#': function () {
             var n = document.getElementById(name);
             if (n.tagName) {
                 result.push(n);
@@ -914,6 +914,22 @@ var ADSAFE = (function () {
                     }
                 }
                 return this;
+            },
+            clone: function (deep, n) {
+                var a = [],
+                    b = this.___nodes___,
+                    c,
+                    i,
+                    j,
+                    k = n ? n : 1;
+                for (i = 0; i < k; i += 1) {
+                    c = [];
+                    for (j = 0; j < b.length; j += 1) {
+                        c.push(b[j].cloneNode(deep));
+                    }
+                    a.push (new Bunch(c));
+                }
+                return n ? a : a [0];
             },
             count: function () {
                 reject_global(this);
