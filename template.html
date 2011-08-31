@@ -3,9 +3,9 @@
 <title>ADsafe Widget Template</title>
 </head>
 <body>
-<p>View source</p>
+<p>This is the page that will contain the widget.</p>
 
-    Load a minimized copy of adsafe.js from your domain. You can combine
+    Load a minifed copy of adsafe.js from your domain. You can combine
     it with other js files to minimize HTTP transactions.
 
 <script src="http://www.yourTrustedDomain.../adsafe.js"></script>
@@ -32,11 +32,12 @@ ADSAFE.id("TEMPLATE_");
 
 <script src="template.js"></script>
 
-    ADSAFE.go starts the execution of the widget.
+    ADSAFE.go is passed a function that starts the execution of the widget.
+    This is required for all widgets.
 
 <script>
 ADSAFE.go("TEMPLATE_", function (dom, lib) {
-    "use strict";
+    'use strict';
 
 // This is where the code for the widget is placed. It can access
 // the document through the dom parameter, allowing it indirect
@@ -44,16 +45,17 @@ ADSAFE.go("TEMPLATE_", function (dom, lib) {
 // and behavior.
 
 // Each library file can give itself a NAME. This program can access
-// the library file as lib.NAME.
+// the library file as lib.NAME. See template.js.
 
 });
 </script>
 
-    The is the end of the widget.
+    This the end of the widget.
 
 </div>
 
     Material that is outside of the div cannot be accessed by the widget.
+    A page could contain many ADsafe widgets.
 
 </body>
 </html>

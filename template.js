@@ -4,7 +4,7 @@
 // object that the widget can use.
 
 ADSAFE.lib("template", function () {
-    "use strict";
+    'use strict';
 
 // This is where the code for the library module is placed. It cannot
 // access the document unless the guest code passes the dom parameter
