@@ -1,5 +1,5 @@
 // adsafe.js
-// 2011-05-31
+// 2012-02-23
 
 //    Public Domain.
 
@@ -20,7 +20,7 @@
 
 /*global window*/
 
-/*jslint browser: true, devel: true, nomen: false, strict: true */
+/*jslint browser: true, devel: true, nomen: true */
 
 /*properties "", "#", "&", "*", "+", ".", "\/", ":blur", ":checked",
     ":disabled", ":enabled", ":even", ":focus", ":hidden", ":odd", ":tag",
@@ -330,9 +330,9 @@ var ADSAFE = (function () {
         var match,          // A match array
             query = [],     // The resulting query array
             selector,
-            qx = id ?
-                /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/ :
-                /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
+            qx = id
+                ? /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/
+                : /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
 
 // Loop over all of the selectors in the text.
 
@@ -544,9 +544,8 @@ var ADSAFE = (function () {
                 f = flipflop;
                 flipflop = !flipflop;
                 return f;
-            } else {
-                return false;
             }
+            return false;
         },
         ':focus': function (node) {
             return node === has_focus;
@@ -558,9 +557,8 @@ var ADSAFE = (function () {
             if (node.tagName) {
                 flipflop = !flipflop;
                 return flipflop;
-            } else {
-                return false;
             }
+            return false;
         },
         ':tag': function (node) {
             return node.tagName;
@@ -838,11 +836,9 @@ var ADSAFE = (function () {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         for (j = 0; j < rep.length; j += 1) {
-                            node.appendChild(
-                                flag ?
-                                    rep[j].cloneNode(true) :
-                                    rep[j]
-                            );
+                            node.appendChild(flag
+                                    ? rep[j].cloneNode(true)
+                                    : rep[j]);
                         }
                         flag = true;
                     }
@@ -921,15 +917,15 @@ var ADSAFE = (function () {
                     c,
                     i,
                     j,
-                    k = n ? n : 1;
+                    k = n || 1;
                 for (i = 0; i < k; i += 1) {
                     c = [];
                     for (j = 0; j < b.length; j += 1) {
                         c.push(b[j].cloneNode(deep));
                     }
-                    a.push (new Bunch(c));
+                    a.push(new Bunch(c));
                 }
-                return n ? a : a [0];
+                return n ? a : a[0];
             },
             count: function () {
                 reject_global(this);
@@ -1159,12 +1155,11 @@ var ADSAFE = (function () {
                         start = node.selectionStart;
                         end = node.selectionEnd;
                         return node.value.slice(start, end);
-                    } else {
-                        range = node.createTextRange();
-                        range.expand('textedit');
-                        if (range.inRange(the_range)) {
-                            return the_range.text;
-                        }
+                    }
+                    range = node.createTextRange();
+                    range.expand('textedit');
+                    if (range.inRange(the_range)) {
+                        return the_range.text;
                     }
                 }
                 return null;
@@ -1181,9 +1176,10 @@ var ADSAFE = (function () {
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
                     if (node.tagName) {
-                        s = name !== 'float' ? getStyleObject(node)[name] :
-                            getStyleObject(node).cssFloat ||
-                            getStyleObject(node).styleFloat;
+                        s = name !== 'float'
+                            ? getStyleObject(node)[name]
+                            : getStyleObject(node).cssFloat ||
+                                getStyleObject(node).styleFloat;
                         if (typeof s === 'string') {
                             a[i] = s;
                         }
@@ -1722,10 +1718,9 @@ var ADSAFE = (function () {
             reject_global(o);
             if (Object.hasOwnProperty('create')) {
                 return Object.create(o);
-            } else {
-                F.prototype = typeof o === 'object' && o ? o : Object.prototype;
-                return new F();
             }
+            F.prototype = typeof o === 'object' && o ? o : Object.prototype;
+            return new F();
         },
 
 //  ADSAFE.get retrieves a value from an object.
