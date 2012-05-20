@@ -2,9 +2,18 @@
 <head>
 <title>ADsafe Widget Structure</title>
 <style>
-h1, p {color: black; font-weight: normal;}
-b {color: darkblue; font-weight: normal;}
-h1 {font-size: 120%; text-align: center;}
+h1, p {
+    color: black;
+    font-weight: normal;
+}
+b {
+    color: darkblue;
+    font-weight: normal;
+}
+h1 {
+    font-size: 120%;
+    text-align: center;
+}
 </style>
 </head>
 
@@ -168,7 +177,7 @@ ADSAFE.go(&quot;<var>WIDGETNAME_</var>&quot;, function (dom, lib) {
     var style = bunch.prototype.style;
 
     bunch.prototype.style = function (name, value) {
-        if (name.toLowerCase() === 'position' &&
+        if (name.toLowerCase() === 'position' &amp;&amp;
                 value.toLowerCase() === 'absolute') {
             throw {
                 name: 'error',

@@ -1,5 +1,5 @@
 // adsafe.js
-// 2012-02-23
+// 2012-05-09
 
 //    Public Domain.
 
@@ -20,43 +20,42 @@
 
 /*global window*/
 
-/*jslint browser: true, devel: true, nomen: true */
+/*jslint browser: true, devel: true, forin: true, nomen: true */
 
-/*properties "", "#", "&", "*", "+", ".", "\/", ":blur", ":checked",
-    ":disabled", ":enabled", ":even", ":focus", ":hidden", ":odd", ":tag",
-    ":text", ":trim", ":unchecked", ":visible", ">", "[", "[!=", "[$=",
-    "[*=", "[=", "[^=", "[|=", "[~=", _, "___ on ___", "___adsafe root___",
-    ___nodes___, ___star___, __defineGetter__, "_adsafe mark_", _intercept,
-    a, abbr, acronym, addEventListener, address, altKey, append,
-    appendChild, apply, area, arguments, autocomplete, b, bdo, big,
-    blockquote, blur, br, bubble, button, call, callee, caller,
-    cancelBubble, canvas, caption, center, change, charAt, charCode, check,
-    checked, childNodes, cite, class, className, clientX, clientY, clone,
-    cloneNode, code, col, colgroup, combine, concat, console, constructor,
-    count, create, createDocumentFragment, createElement, createRange,
-    createTextNode, createTextRange, cssFloat, ctrlKey, currentStyle, dd,
-    defaultView, del, dfn, dir, disabled, div, dl, dt, each, em, empty,
-    enable, ephemeral, eval, exec, expand, explode, fieldset, fire,
+/*properties
+    '', '#', '&', '*', '+', '.', '/', ':blur', ':checked', ':disabled',
+    ':enabled', ':even', ':focus', ':hidden', ':odd', ':tag', ':text', ':trim',
+    ':unchecked', ':visible', '>', '[', '[!=', '[$=', '[*=', '[=', '[^=', '[|=',
+    '[~=', _, '___ on ___', '___adsafe root___', ___nodes___, ___star___,
+    __defineGetter__, '_adsafe mark_', _intercept, a, abbr, acronym,
+    addEventListener, address, altKey, append, appendChild, apply, area,
+    arguments, autocomplete, b, bdo, big, blockquote, blur, br, bubble, button,
+    call, callee, caller, cancelBubble, canvas, caption, center, change, charAt,
+    charCode, check, checked, childNodes, cite, class, className, clientX,
+    clientY, clone, cloneNode, code, col, colgroup, combine, concat, console,
+    constructor, count, create, createDocumentFragment, createElement,
+    createRange, createTextNode, createTextRange, cssFloat, ctrlKey,
+    currentStyle, dd, defaultView, del, dfn, dir, disabled, div, dl, dt, each,
+    em, empty, enable, ephemeral, eval, exec, expand, explode, fieldset, fire,
     firstChild, focus, font, form, fragment, fromCharCode, get, getCheck,
     getChecks, getClass, getClasses, getComputedStyle, getElementById,
-    getElementsByTagName, getMark, getMarks, getName, getNames,
-    getOffsetHeight, getOffsetHeights, getOffsetWidth, getOffsetWidths,
-    getParent, getSelection, getStyle, getStyles, getTagName, getTagNames,
-    getTitle, getTitles, getValue, getValues, go, h1, h2, h3, h4, h5, h6,
-    has, hasOwnProperty, hr, i, id, img, inRange, indexOf, input, ins,
-    insertBefore, isArray, kbd, key, keyCode, klass, label, later, legend,
-    length, li, lib, log, map, mark, menu, message, name, nextSibling,
-    nodeName, nodeValue, object, off, offsetHeight, offsetWidth, ol, on,
-    onclick, ondblclick, onfocusin, onfocusout, onkeypress, onmousedown,
-    onmousemove, onmouseout, onmouseover, onmouseup, op, optgroup, option,
-    p, parent, parentNode, postError, pre, prepend, preventDefault, protect,
-    prototype, push, q, remove, removeChild, removeElement, replace,
+    getElementsByTagName, getMark, getMarks, getName, getNames, getOffsetHeight,
+    getOffsetHeights, getOffsetWidth, getOffsetWidths, getParent, getSelection,
+    getStyle, getStyles, getTagName, getTagNames, getTitle, getTitles, getValue,
+    getValues, go, h1, h2, h3, h4, h5, h6, has, hasOwnProperty, hr, i, id, img,
+    inRange, indexOf, input, ins, insertBefore, isArray, kbd, key, keyCode, keys,
+    klass, label, later, legend, length, li, lib, log, map, mark, menu, message,
+    name, nextSibling, nodeName, nodeValue, object, off, offsetHeight,
+    offsetWidth, ol, on, onclick, ondblclick, onfocusin, onfocusout, onkeypress,
+    onmousedown, onmousemove, onmouseout, onmouseover, onmouseup, op, optgroup,
+    option, p, parent, parentNode, postError, pre, prepend, preventDefault,
+    protect, prototype, push, q, remove, removeChild, removeElement, replace,
     replaceChild, returnValue, row, samp, select, selection, selectionEnd,
     selectionStart, set, shiftKey, slice, small, span, srcElement, stack,
-    stopPropagation, strong, style, styleFloat, sub, sup, table, tag,
-    tagName, target, tbody, td, test, text, textarea, tfoot, th, that,
-    thead, title, toLowerCase, toString, toUpperCase, tr, tt, type, u, ul,
-    unwatch, value, valueOf, var, visibility, watch, window, writeln, x, y
+    stopPropagation, strong, style, styleFloat, sub, sup, table, tag, tagName,
+    target, tbody, td, test, text, textarea, tfoot, th, that, thead, title,
+    toLowerCase, toString, toUpperCase, tr, tt, type, u, ul, unwatch, value,
+    valueOf, var, visibility, watch, window, writeln, x, y
 */
 
 var ADSAFE = (function () {
@@ -207,44 +206,6 @@ var ADSAFE = (function () {
         return object && typeof object === 'object' &&
             Object.prototype.hasOwnProperty.call(object, string_check(string));
     }
-
-    if (Function.__defineGetter__) {
-
-//  Firefox implemented some of its array methods carelessly. If a method is
-//  called as a function it returns the global object. ADsafe cannot tolerate
-//  that, so we must wrap the methods to make them safer and slower.
-
-        (function mozilla(name) {
-            var method = Array.prototype[name];
-            Array.prototype[name] = function () {
-                return !this || this.window ? error() : method.apply(this, arguments);
-            };
-            return mozilla;
-        }
-        ('concat')
-        ('every')
-        ('filter')
-        ('forEach')
-        ('map')
-        ('reduce')
-        ('reduceRight')
-        ('reverse')
-        ('slice')
-        ('some')
-        ('sort'));
-
-//  Firefox also leaked some internal state through negative subscripts of
-//  functions. This plugs the holes.
-
-        (function (p, f) {
-            p.__defineGetter__('-1', f);
-            p.__defineGetter__('-3', f);
-            p.__defineGetter__('-6', f);
-        }(Function.prototype, function () {
-            return null;
-        }));
-    }
-
 
 //  The reject functions enforce the restriction on property names.
 //  reject_property allows access only to objects and arrays. It does not allow
@@ -1222,7 +1183,7 @@ var ADSAFE = (function () {
                         a[i] = node.nodeValue;
                     } else if (node.tagName && node.type !== 'password') {
                         a[i] = node.value;
-                        if (a[i] === undefined && node.firstChild &&
+                        if (!a[i] && node.firstChild &&
                                 node.firstChild.nodeName === '#text') {
                             a[i] = node.firstChild.nodeValue;
                         }
@@ -1552,7 +1513,7 @@ var ADSAFE = (function () {
                                     node.value = value[i];
                                 } else {
                                     while (node.firstChild) {
-                                        purge_event_handlers(node);
+                                        purge_event_handlers(node.firstChild);
                                         node.removeChild(node.firstChild);
                                     }
                                     node.appendChild(document.createTextNode(
@@ -1569,11 +1530,12 @@ var ADSAFE = (function () {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         if (node.tagName) {
-                            if (typeof node.value === 'string') {
+                            if (node.tagName !== 'BUTTON' &&
+                                    typeof node.value === 'string') {
                                 node.value = value;
                             } else {
                                 while (node.firstChild) {
-                                    purge_event_handlers(node);
+                                    purge_event_handlers(node.firstChild);
                                     node.removeChild(node.firstChild);
                                 }
                                 node.appendChild(document.createTextNode(value));
@@ -1822,6 +1784,20 @@ var ADSAFE = (function () {
 
         isArray: Array.isArray || function (value) {
             return Object.prototype.toString.apply(value) === '[object Array]';
+        },
+
+
+
+//  ADSAFE.keys returns an array of keys.
+
+        keys: Object.keys || function (object) {
+            var key, result = [];
+            for (key in object) {
+                if (owns(object, key)) {
+                    result.push(key);
+                }
+            }
+            return result;
         },
 
 

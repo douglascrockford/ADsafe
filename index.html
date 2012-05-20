@@ -2,9 +2,18 @@
 <head>
 <title>ADsafe</title>
 <style>
-h1, p {color: black; font-weight: normal;}
-b {color: darkblue; font-weight: normal;}
-h1 {font-size: 120%; text-align: center;}
+h1, p {
+    color: black;
+    font-weight: normal;
+}
+b {
+    color: darkblue;
+    font-weight: normal;
+}
+h1 {
+    font-size: 120%;
+    text-align: center;
+}
 </style>
 </head>
 
@@ -13,10 +22,16 @@ h1 {font-size: 120%; text-align: center;}
     <img src="adsafe.gif" border="2" width="300" height="147"><br>
     <div style="color: dimgray; font-size: 200%; font-family: sans-serif; text-align: center;">ALPHA</div>
     <div style="margin-top: 6px; padding: 1em; background-color: lemonchiffon; border: 2px solid black;">
-        <div> <a href="widget.html">Widget Structure</a></div>
-        <div> <a href="dom.html">DOM API</a></div>
+        <div> <a href="widget.html">Widget Structure</a></div><hr>
+        <div> <a href="dom.html">DOM API</a></div><hr>
 
     <div>Sample widgets: <a href="roman.html">Roman</a> <a href="bats.html">Bats</a> <a href="sudoku.html">Sudoku</a> <a href="http://www.JSLint.com/">JSLint</a></div>
+    </div>
+    <div style="margin-top: 12px; padding: 1em; background-color: lemonchiffon; border: 2px solid black;">
+        <div> <a href="http://www.cs.brown.edu/research/plt/dl/adsafety/v1/adsafety.pdf">ADsafety: Type-Based Verification of JavaScript Sandboxing</a></div><hr>
+        <div> <a href="http://seclab.stanford.edu/websec/jsPapers/csf09-camera-ready.pdf">Language-Based Isolation of Untrusted JavaScript</a></div><hr>
+        <div> <a href="http://www-cs-students.stanford.edu/~ataly/Papers/sp11.pdf">Automated Analysis of Security-Critical JavaScript APIs</a></div><hr>
+        <div> <a href="http://www.adambarth.com/papers/2010/finifter-weinberger-barth.pdf">Preventing Capability Leaks in Secure JavaScript Subsets</a></div>
     </div>
     <div style="padding: 2px; text-align: center;"><a href="http://www.JSLint.com/"><img src="jslint.gif" alt="JSLint" width="32" height="17" border="0"></a> <a href="http://waterken.com/"><img src="w.gif" alt="Waterken" width="16" height="16" border="0"></a></div>
   </div>
@@ -62,14 +77,15 @@ h1 {font-size: 120%; text-align: center;}
               and <code>Math</code> is allowed.</li>
           </ul>
         </li>
-        <li> <code>this</code>
+        <li><code>this</code>
           <ul>
             <li>If a method is called as a function, <code>this</code> is
               bound to the global object. Since AD<b>safe</b> needs to restrict
               access to the global object, it must prohibit the use of <code>this</code>
               in guest code.</li>
           </ul>
-        <li> <code>arguments</code>
+        </li>
+        <li><code>arguments</code>
           <ul>
             <li>Access to the  <code>arguments</code> pseudo-array is not allowed.</li>
           </ul>
@@ -103,8 +119,8 @@ h1 {font-size: 120%; text-align: center;}
         </li>
 
     <li><code>[ ]</code> subscript operator except when the subscript is
-      a  numeric literal or string literal or an expression that must produce a number value.
-        <ul>
+      a  numeric literal or string literal or an expression that must produce a number value. So expressions like <code>a[i]</code> are disallowed because we cannot statically determine that <code>i</code> is not one of the dangerous property names. But <code>a[+i]</code> is allowed, because <code>+i</code> will always produce a number.
+      <ul>
 
         <li>Lookup of dynamic properties could provide access to the restricted
           members. Use the <code>ADSAFE.get</code> and <code>ADSAFE.set</code>
@@ -132,7 +148,7 @@ h1 {font-size: 120%; text-align: center;}
       <p>Untrusted code will be able to indirectly call the <code>window.onerror</code>
         handler. The handler must be coded such that being called by untrusted
         code will cause no breach.</p>
-      <p>None of the prototypes of the builtin types may be augmented with
+      <p>None of the prototypes of the built-in types may be augmented with
         methods that can breach AD<b>safe</b>'s containment.</p>
 
   <p>All of the HTML <code>id</code> attributes defined on the page must
@@ -164,7 +180,7 @@ h1 {font-size: 120%; text-align: center;}
     <tr>
       <td valign="top"><code>has(</code><var>object</var><code>,</code>
         <var>name</var><code>)</code></td>
-      <td><code>true</code> if the  <var>object</var> has an own proerty with that <var>name</var>.</td>
+      <td><code>true</code> if the  <var>object</var> has an own property with that <var>name</var>.</td>
     </tr>
     <tr>
       <td valign="top"><code>id(</code><var>id</var><code>)</code></td>
@@ -172,17 +188,20 @@ h1 {font-size: 120%; text-align: center;}
         string must match the <code>id</code> of the widget's <code>div</code>.</td>
     </tr>
     <tr>
-      <td valign="top"><code>isArray(</code><var>value</var><code>)</code></td>
-      <td>Returns <code>true</code> if the <var>value</var> is an array.</td>
+        <td valign="top"><code>isArray(</code><var>value</var><code>)</code></td>
+        <td>Returns <code>true</code> if the <var>value</var> is an array.</td>
     </tr>
     <tr>
-      <td nowrap valign="top"><code>later(</code><var>function</var><code>,</code>
-        <var>milliseconds</var><code>)</code></td>
-      <td>Call a function in the future.</td>
+        <td nowrap valign="top"><code>keys(</code><var>object</var><code>)</code></td>
+        <td>Produce an array of keys from the own enumerable properties of an object.</td>
     </tr>
     <tr>
-      <td valign="top"><code>lib(</code><var>name</var><code>,</code> <var>function</var><code>)</code></td>
-      <td>Register an ADsafe <a href="widget.html">library</a>.</td>
+        <td nowrap valign="top"><code>later(</code><var>function</var><code>,</code> <var>milliseconds</var><code>)</code></td>
+        <td>Call a function in the future.</td>
+    </tr>
+    <tr>
+        <td valign="top"><code>lib(</code><var>name</var><code>,</code> <var>function</var><code>)</code></td>
+        <td>Register an ADsafe <a href="widget.html">library</a>.</td>
     </tr>
     <tr>
       <td valign="top"><code>log(</code><var>string</var><code>)</code></td>
