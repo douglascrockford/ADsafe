@@ -1,5 +1,5 @@
 // adsafe.js
-// 2012-05-09
+// 2013-05-09
 
 //    Public Domain.
 
@@ -793,15 +793,21 @@ var ADSAFE = (function () {
                         }
                     }
                 } else {
-                    rep = appendage.___nodes___;
+                    if (typeof appendage !== 'string') {
+                        rep = appendage.___nodes___;
+                    }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
-                        for (j = 0; j < rep.length; j += 1) {
-                            node.appendChild(flag
-                                    ? rep[j].cloneNode(true)
-                                    : rep[j]);
+                        if (rep) {
+                            for (j = 0; j < rep.length; j += 1) {
+                                node.appendChild(flag
+                                        ? rep[j].cloneNode(true)
+                                        : rep[j]);
+                            }
+                            flag = true;
+                        } else {
+                            node.appendChild(document.createTextNode(appendage));
                         }
-                        flag = true;
                     }
                 }
                 return this;
@@ -1553,7 +1559,11 @@ var ADSAFE = (function () {
 
         dom = {
             append: function (bunch) {
-                var b = bunch.___nodes___, i, n;
+                var b = typeof bunch === 'string'
+                        ? [document.createTextNode(bunch)]
+                        : bunch.___nodes___,
+                    i,
+                    n;
                 for (i = 0; i < b.length; i += 1) {
                     n = b[i];
                     if (typeof n === 'string' || typeof n === 'number') {
