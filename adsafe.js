@@ -1,5 +1,5 @@
 // adsafe.js
-// 2013-05-09
+// 2013-05-26
 
 //    Public Domain.
 
@@ -1679,20 +1679,12 @@ var ADSAFE = (function () {
     }
 
 
-    function F() {}
-
-
 //  Return the ADSAFE object.
 
     return {
-
         create: function (o) {
             reject_global(o);
-            if (Object.hasOwnProperty('create')) {
-                return Object.create(o);
-            }
-            F.prototype = typeof o === 'object' && o ? o : Object.prototype;
-            return new F();
+            return Object.create(o);
         },
 
 //  ADSAFE.get retrieves a value from an object.
