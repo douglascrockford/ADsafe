@@ -20,7 +20,7 @@
 
 /*global window*/
 
-/*jslint browser: true, devel: true, forin: true, nomen: true */
+/*jslint browser: true, devel: true, forin: true, nomen: true, undersc: true */
 
 /*properties
     '', '#', '&', '*', '+', '.', '/', ':blur', ':checked', ':disabled',
