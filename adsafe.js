@@ -1,5 +1,5 @@
 // adsafe.js
-// 2013-05-26
+// 2015-01-12
 
 //    Public Domain.
 
@@ -43,19 +43,19 @@
     getOffsetHeights, getOffsetWidth, getOffsetWidths, getParent, getSelection,
     getStyle, getStyles, getTagName, getTagNames, getTitle, getTitles, getValue,
     getValues, go, h1, h2, h3, h4, h5, h6, has, hasOwnProperty, hr, i, id, img,
-    inRange, indexOf, input, ins, insertBefore, isArray, kbd, key, keyCode, keys,
-    klass, label, later, legend, length, li, lib, log, map, mark, menu, message,
-    name, nextSibling, nodeName, nodeValue, object, off, offsetHeight,
-    offsetWidth, ol, on, onclick, ondblclick, onfocusin, onfocusout, onkeypress,
-    onmousedown, onmousemove, onmouseout, onmouseover, onmouseup, op, optgroup,
-    option, p, parent, parentNode, postError, pre, prepend, preventDefault,
-    protect, prototype, push, q, remove, removeChild, removeElement, replace,
-    replaceChild, returnValue, row, samp, select, selection, selectionEnd,
-    selectionStart, set, shiftKey, slice, small, span, srcElement, stack,
-    stopPropagation, strong, style, styleFloat, sub, sup, table, tag, tagName,
-    target, tbody, td, test, text, textarea, tfoot, th, that, thead, title,
-    toLowerCase, toString, toUpperCase, tr, tt, type, u, ul, unwatch, value,
-    valueOf, var, visibility, watch, window, writeln, x, y
+    indeterminate, inRange, indexOf, input, ins, insertBefore, isArray, kbd, 
+    key, keyCode, keys, klass, label, later, legend, length, li, lib, log, map, 
+    mark, menu, message, name, nextSibling, nodeName, nodeValue, object, off, 
+    offsetHeight, offsetWidth, ol, on, onclick, ondblclick, onfocusin, 
+    onfocusout, onkeypress, onmousedown, onmousemove, onmouseout, onmouseover, 
+    onmouseup, op, optgroup, option, p, parent, parentNode, postError, pre, 
+    prepend, preventDefault, protect, prototype, push, q, remove, removeChild, 
+    removeElement, replace, replaceChild, returnValue, row, samp, select, 
+    selection, selectionEnd, selectionStart, set, shiftKey, slice, small, span, 
+    srcElement, stack, stopPropagation, strong, style, styleFloat, sub, sup, 
+    table, tag, tagName, target, tbody, td, test, text, textarea, tfoot, th, 
+    that, thead, title, toLowerCase, toString, toUpperCase, tr, tt, type, u, ul, 
+    unwatch, value, valueOf, var, visibility, watch, window, writeln, x, y
 */
 
 var ADSAFE = (function () {
@@ -1159,10 +1159,12 @@ var ADSAFE = (function () {
             },
             getTagNames: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i, name;
+                var a = [], b = this.___nodes___, i, tagName;
                 for (i = 0; i < b.length; i += 1) {
-                    name = b[i].tagName;
-                    a[i] = typeof name === 'string' ? name.toLowerCase() : name;
+                    tagName = b[i].tagName;
+                    a[i] = typeof tagName === 'string' 
+                        ? tagName.toLowerCase() 
+                        : tagName;
                 }
                 return a;
             },
@@ -1196,6 +1198,30 @@ var ADSAFE = (function () {
                     }
                 }
                 return a;
+            },
+            indeterminate: function (value) {
+                reject_global(this);
+                var b = this.___nodes___, i, node;
+                if (value instanceof Array) {
+                    if (value.length !== b.length) {
+                        error('ADsafe: Array length: ' + b.length + '-' +
+                            value.length);
+                    }
+                    for (i = 0; i < b.length; i += 1) {
+                        node = b[i];
+                        if (node.tagName) {
+                            node.indeterminate = !!value[i];
+                        }
+                    }
+                } else {
+                    for (i = 0; i < b.length; i += 1) {
+                        node = b[i];
+                        if (node.tagName) {
+                            node.indeterminate = !!value;
+                        }
+                    }
+                }
+                return this;
             },
             klass: function (value) {
                 return this['class'](value);
@@ -1793,13 +1819,13 @@ var ADSAFE = (function () {
 //  ADSAFE.keys returns an array of keys.
 
         keys: Object.keys || function (object) {
-            var key, result = [];
+            var key, keys = [];
             for (key in object) {
                 if (owns(object, key)) {
-                    result.push(key);
+                    keys.push(key);
                 }
             }
-            return result;
+            return keys;
         },
 
 
