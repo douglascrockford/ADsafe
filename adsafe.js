@@ -1,5 +1,5 @@
 // adsafe.js
-// 2015-01-12
+// 2015-02-24
 
 //    Public Domain.
 
@@ -20,46 +20,44 @@
 
 /*global window*/
 
-/*jslint browser: true, devel: true, forin: true, nomen: true */
-
-/*properties
-    '', '#', '&', '*', '+', '.', '/', ':blur', ':checked', ':disabled',
-    ':enabled', ':even', ':focus', ':hidden', ':odd', ':tag', ':text', ':trim',
-    ':unchecked', ':visible', '>', '[', '[!=', '[$=', '[*=', '[=', '[^=', '[|=',
-    '[~=', _, '___ on ___', '___adsafe root___', ___nodes___, ___star___,
-    __defineGetter__, '_adsafe mark_', _intercept, a, abbr, acronym,
-    addEventListener, address, altKey, append, appendChild, apply, area,
-    arguments, autocomplete, b, bdo, big, blockquote, blur, br, bubble, button,
-    call, callee, caller, cancelBubble, canvas, caption, center, change, charAt,
-    charCode, check, checked, childNodes, cite, class, className, clientX,
-    clientY, clone, cloneNode, code, col, colgroup, combine, concat, console,
-    constructor, count, create, createDocumentFragment, createElement,
-    createRange, createTextNode, createTextRange, cssFloat, ctrlKey,
-    currentStyle, dd, defaultView, del, dfn, dir, disabled, div, dl, dt, each,
-    em, empty, enable, ephemeral, eval, exec, expand, explode, fieldset, fire,
-    firstChild, focus, font, form, fragment, fromCharCode, get, getCheck,
-    getChecks, getClass, getClasses, getComputedStyle, getElementById,
-    getElementsByTagName, getMark, getMarks, getName, getNames, getOffsetHeight,
-    getOffsetHeights, getOffsetWidth, getOffsetWidths, getParent, getSelection,
-    getStyle, getStyles, getTagName, getTagNames, getTitle, getTitles, getValue,
-    getValues, go, h1, h2, h3, h4, h5, h6, has, hasOwnProperty, hr, i, id, img,
-    indeterminate, inRange, indexOf, input, ins, insertBefore, isArray, kbd, 
-    key, keyCode, keys, klass, label, later, legend, length, li, lib, log, map, 
-    mark, menu, message, name, nextSibling, nodeName, nodeValue, object, off, 
-    offsetHeight, offsetWidth, ol, on, onclick, ondblclick, onfocusin, 
-    onfocusout, onkeypress, onmousedown, onmousemove, onmouseout, onmouseover, 
-    onmouseup, op, optgroup, option, p, parent, parentNode, postError, pre, 
-    prepend, preventDefault, protect, prototype, push, q, remove, removeChild, 
-    removeElement, replace, replaceChild, returnValue, row, samp, select, 
-    selection, selectionEnd, selectionStart, set, shiftKey, slice, small, span, 
-    srcElement, stack, stopPropagation, strong, style, styleFloat, sub, sup, 
-    table, tag, tagName, target, tbody, td, test, text, textarea, tfoot, th, 
-    that, thead, title, toLowerCase, toString, toUpperCase, tr, tt, type, u, ul, 
-    unwatch, value, valueOf, var, visibility, watch, window, writeln, x, y
+/*jslint browser, devel, for, this 
 */
 
-var ADSAFE = (function () {
-    "use strict";
+/*property
+    _, ___nodes___, ___star___, _intercept, a, abbr, acronym, addEventListener,
+    address, altKey, append, appendChild, apply, area, arguments, autocomplete,
+    b, bdo, big, blockquote, blur, br, bubble, button, call, callee, caller,
+    cancelBubble, canvas, caption, center, change, charAt, charCode, check,
+    checked, childNodes, cite, class, className, clientX, clientY, clone,
+    cloneNode, code, col, colgroup, combine, concat, console, constructor,
+    count, create, createDocumentFragment, createElement, createRange,
+    createTextNode, createTextRange, cssFloat, ctrlKey, currentStyle, dd,
+    defaultView, del, dfn, dir, disabled, div, dl, dt, each, em, empty, enable,
+    ephemeral, eval, exec, expand, explode, fieldset, fire, firstChild, focus,
+    font, form, fragment, fromCharCode, get, getCheck, getChecks, getClass,
+    getClasses, getComputedStyle, getElementById, getElementsByTagName,
+    getMark, getMarks, getName, getNames, getOffsetHeight, getOffsetHeights,
+    getOffsetWidth, getOffsetWidths, getParent, getSelection, getStyle,
+    getStyles, getTagName, getTagNames, getTitle, getTitles, getValue,
+    getValues, go, h1, h2, h3, h4, h5, h6, has, hasOwnProperty, hr, i, id, img,
+    inRange, indeterminate, indexOf, input, ins, insertBefore, isArray, kbd,
+    key, keyCode, keys, klass, label, later, legend, length, li, lib, log, map,
+    mark, menu, message, name, nextSibling, nodeName, nodeValue, object, off,
+    offsetHeight, offsetWidth, ol, on, onclick, ondblclick, onfocusin,
+    onfocusout, onkeypress, onmousedown, onmousemove, onmouseout, onmouseover,
+    onmouseup, op, optgroup, option, p, parent, parentNode, postError, pre,
+    prepend, preventDefault, protect, prototype, push, q, remove, removeChild,
+    removeElement, replace, replaceChild, returnValue, row, samp, select,
+    selection, selectionEnd, selectionStart, set, shiftKey, slice, small, span,
+    srcElement, stack, stopPropagation, strong, style, styleFloat, sub, sup,
+    table, tag, tagName, target, tbody, td, test, text, textarea, tfoot, th,
+    that, thead, title, toLowerCase, toString, toUpperCase, tr, tt, type, u,
+    ul, unwatch, value, valueOf, var, visibility, watch, window, writeln, x, y
+*/
+
+var ADSAFE;
+ADSAFE = (function () {
+    'use strict';
 
     var adsafe_id,      // The id of the current widget
         adsafe_lib,     // The script libraries loaded by the current widget
@@ -68,16 +66,16 @@ var ADSAFE = (function () {
 // ADSAFE.put methods will not allow access to these properties.
 
         banned = {
-            'arguments'     : true,
-            callee          : true,
-            caller          : true,
-            constructor     : true,
-            'eval'          : true,
-            prototype       : true,
-            stack           : true,
-            unwatch         : true,
-            valueOf         : true,
-            watch           : true
+            arguments: true,
+            callee: true,
+            caller: true,
+            constructor: true,
+            eval: true,
+            prototype: true,
+            stack: true,
+            unwatch: true,
+            valueOf: true,
+            watch: true
         },
 
         cache_style_object,
@@ -94,78 +92,78 @@ var ADSAFE = (function () {
 // This is the whitelist of elements that may be created with the .tag(tagName)
 // method.
 
-            a         : true,
-            abbr      : true,
-            acronym   : true,
-            address   : true,
-            area      : true,
-            b         : true,
-            bdo       : true,
-            big       : true,
+            a: true,
+            abbr: true,
+            acronym: true,
+            address: true,
+            area: true,
+            b: true,
+            bdo: true,
+            big: true,
             blockquote: true,
-            br        : true,
-            button    : true,
-            canvas    : true,
-            caption   : true,
-            center    : true,
-            cite      : true,
-            code      : true,
-            col       : true,
-            colgroup  : true,
-            dd        : true,
-            del       : true,
-            dfn       : true,
-            dir       : true,
-            div       : true,
-            dl        : true,
-            dt        : true,
-            em        : true,
-            fieldset  : true,
-            font      : true,
-            form      : true,
-            h1        : true,
-            h2        : true,
-            h3        : true,
-            h4        : true,
-            h5        : true,
-            h6        : true,
-            hr        : true,
-            i         : true,
-            img       : true,
-            input     : true,
-            ins       : true,
-            kbd       : true,
-            label     : true,
-            legend    : true,
-            li        : true,
-            map       : true,
-            menu      : true,
-            object    : true,
-            ol        : true,
-            optgroup  : true,
-            option    : true,
-            p         : true,
-            pre       : true,
-            q         : true,
-            samp      : true,
-            select    : true,
-            small     : true,
-            span      : true,
-            strong    : true,
-            sub       : true,
-            sup       : true,
-            table     : true,
-            tbody     : true,
-            td        : true,
-            textarea  : true,
-            tfoot     : true,
-            th        : true,
-            thead     : true,
-            tr        : true,
-            tt        : true,
-            u         : true,
-            ul        : true,
-            'var'     : true
+            br: true,
+            button: true,
+            canvas: true,
+            caption: true,
+            center: true,
+            cite: true,
+            code: true,
+            col: true,
+            colgroup: true,
+            dd: true,
+            del: true,
+            dfn: true,
+            dir: true,
+            div: true,
+            dl: true,
+            dt: true,
+            em: true,
+            fieldset: true,
+            font: true,
+            form: true,
+            h1: true,
+            h2: true,
+            h3: true,
+            h4: true,
+            h5: true,
+            h6: true,
+            hr: true,
+            i: true,
+            img: true,
+            input: true,
+            ins: true,
+            kbd: true,
+            label: true,
+            legend: true,
+            li: true,
+            map: true,
+            menu: true,
+            object: true,
+            ol: true,
+            optgroup: true,
+            option: true,
+            p: true,
+            pre: true,
+            q: true,
+            samp: true,
+            select: true,
+            small: true,
+            span: true,
+            strong: true,
+            sub: true,
+            sup: true,
+            table: true,
+            tbody: true,
+            td: true,
+            textarea: true,
+            tfoot: true,
+            th: true,
+            thead: true,
+            tr: true,
+            tt: true,
+            u: true,
+            ul: true,
+            var: true
         },
         name,
         pecker,     // set of pecker patterns
@@ -204,7 +202,7 @@ var ADSAFE = (function () {
 
     function owns(object, string) {
         return object && typeof object === 'object' &&
-            Object.prototype.hasOwnProperty.call(object, string_check(string));
+                Object.prototype.hasOwnProperty.call(object, string_check(string));
     }
 
 //  The reject functions enforce the restriction on property names.
@@ -214,7 +212,7 @@ var ADSAFE = (function () {
 
     function reject_name(name) {
         return typeof name !== 'number' && (typeof name !== 'string' ||
-            banned[name] || name.charAt(0) === '_' || name.slice(-1) === '_');
+                banned[name] || name.charAt(0) === '_' || name.slice(-1) === '_');
     }
 
 
@@ -239,7 +237,7 @@ var ADSAFE = (function () {
         }
         cache_style_node = node;
         cache_style_object =
-            node.currentStyle || defaultView.getComputedStyle(node, '');
+                node.currentStyle || defaultView.getComputedStyle(node, '');
         return cache_style_object;
     }
 
@@ -269,7 +267,8 @@ var ADSAFE = (function () {
 
         walkTheDOM(node, function (node) {
             if (node.tagName) {
-                node['___ on ___'] = node.change = null;
+                node['___ on ___'] = null;
+                node.change = null;
             }
         });
     }
@@ -292,8 +291,8 @@ var ADSAFE = (function () {
             query = [],     // The resulting query array
             selector,
             qx = id
-                ? /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/
-                : /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
+            ? /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/
+            : /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
 
 // Loop over all of the selectors in the text.
 
@@ -330,11 +329,13 @@ var ADSAFE = (function () {
 
 // The selector is in brackets.
 
-                selector = match[3] ? {
+                selector = match[3] 
+                ? {
                     op: '[' + match[3],
                     name: match[2],
                     value: match[4]
-                } : {
+                } 
+                : {
                     op: '[',
                     name: match[2]
                 };
@@ -393,8 +394,10 @@ var ADSAFE = (function () {
 
             try {
                 array = Array.prototype.slice.call(nodelist, 0);
-                result = result.length ? result.concat(array) : array;
-            } catch (ie) {
+                result = result.length 
+                ? result.concat(array) 
+                : array;
+            } catch (ignore) {
                 length = nodelist.length;
                 for (i = 0; i < length; i += 1) {
                     result.push(nodelist[i]);
@@ -465,27 +468,27 @@ var ADSAFE = (function () {
         '[^=': function (node) {
             var member = node[name];
             return typeof member === 'string' &&
-                member.slice(0, member.length) === value;
+                    member.slice(0, member.length) === value;
         },
         '[$=': function (node) {
             var member = node[name];
             return typeof member === 'string' &&
-                member.slice(-member.length) === value;
+                    member.slice(-member.length) === value;
         },
         '[*=': function (node) {
             var member = node[name];
             return typeof member === 'string' &&
-                member.indexOf(value) >= 0;
+                    member.indexOf(value) >= 0;
         },
         '[~=': function (node) {
             var member = node[name];
             return typeof member === 'string' &&
-                (' ' + member + ' ').indexOf(' ' + value + ' ') >= 0;
+                    (' ' + member + ' ').indexOf(' ' + value + ' ') >= 0;
         },
         '[|=': function (node) {
             var member = node[name];
             return typeof member === 'string' &&
-                ('-' + member + '-').indexOf('-' + value + '-') >= 0;
+                    ('-' + member + '-').indexOf('-' + value + '-') >= 0;
         },
         ':blur': function (node) {
             return node !== has_focus;
@@ -528,7 +531,7 @@ var ADSAFE = (function () {
             return node.nodeName === '#text';
         },
         ':trim': function (node) {
-            return node.nodeName !== '#text' || /\W/.test(node.nodeValue);
+            return node.nodeName !== '#text' || (/\W/.test(node.nodeValue));
         },
         ':unchecked': function (node) {
             return node.tagName && !node.checked;
@@ -556,7 +559,7 @@ var ADSAFE = (function () {
             if (typeof func === 'function') {
                 if (star) {
                     error("ADsafe: Query violation: *" + selector.op +
-                        (selector.name || ''));
+                            (selector.name || ''));
                 }
                 result = [];
                 for (j = 0; j < nodes.length; j += 1) {
@@ -665,7 +668,7 @@ var ADSAFE = (function () {
                     allow_focus = true;
                     has_focus = the_target;
                     key = String.fromCharCode(the_actual_event.charCode ||
-                        the_actual_event.keyCode);
+                            the_actual_event.keyCode);
                     switch (key) {
                     case '\u000d':
                     case '\u000a':
@@ -737,7 +740,7 @@ var ADSAFE = (function () {
                         the_target['___ on ___'][the_event.type]) {
                     target.fire(the_event);
                 } else {
-                    for (;;) {
+                    while (true) {
                         the_target = the_target.parentNode;
                         if (!the_target) {
                             break;
@@ -760,7 +763,10 @@ var ADSAFE = (function () {
                     }
                     ephemeral = null;
                 }
-                that = the_target = the_event = the_actual_event = null;
+                that = null;
+                the_actual_event = null;
+                the_event = null;
+                the_target = null;
                 return;
             };
 
@@ -784,7 +790,7 @@ var ADSAFE = (function () {
                 if (appendage instanceof Array) {
                     if (appendage.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-                            value.length);
+                                value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         rep = appendage[i].___nodes___;
@@ -801,8 +807,8 @@ var ADSAFE = (function () {
                         if (rep) {
                             for (j = 0; j < rep.length; j += 1) {
                                 node.appendChild(flag
-                                        ? rep[j].cloneNode(true)
-                                        : rep[j]);
+                                ? rep[j].cloneNode(true)
+                                : rep[j]);
                             }
                             flag = true;
                         } else {
@@ -830,7 +836,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-                            value.length);
+                                value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -854,7 +860,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-                            value.length);
+                                value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         if (/url/i.test(string_check(value[i]))) {
@@ -892,7 +898,9 @@ var ADSAFE = (function () {
                     }
                     a.push(new Bunch(c));
                 }
-                return n ? a : a[0];
+                return n 
+                ? a 
+                : a[0];
             },
             count: function () {
                 reject_global(this);
@@ -915,7 +923,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-                            value.length);
+                                value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -941,7 +949,7 @@ var ADSAFE = (function () {
                 if (enable instanceof Array) {
                     if (enable.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-                            enable.length);
+                                enable.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1144,8 +1152,8 @@ var ADSAFE = (function () {
                     node = b[i];
                     if (node.tagName) {
                         s = name !== 'float'
-                            ? getStyleObject(node)[name]
-                            : getStyleObject(node).cssFloat ||
+                        ? getStyleObject(node)[name]
+                        : getStyleObject(node).cssFloat ||
                                 getStyleObject(node).styleFloat;
                         if (typeof s === 'string') {
                             a[i] = s;
@@ -1163,8 +1171,8 @@ var ADSAFE = (function () {
                 for (i = 0; i < b.length; i += 1) {
                     tagName = b[i].tagName;
                     a[i] = typeof tagName === 'string' 
-                        ? tagName.toLowerCase() 
-                        : tagName;
+                    ? tagName.toLowerCase() 
+                    : tagName;
                 }
                 return a;
             },
@@ -1205,7 +1213,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-                            value.length);
+                                value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1224,7 +1232,7 @@ var ADSAFE = (function () {
                 return this;
             },
             klass: function (value) {
-                return this['class'](value);
+                return this.class(value);
             },
             mark: function (value) {
                 reject_global(this);
@@ -1232,7 +1240,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
-                            value.length);
+                                value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1256,7 +1264,7 @@ var ADSAFE = (function () {
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
                     if (typeof type === 'string') {
-                        if (typeof node['___ on ___']) {
+                        if (typeof node['___ on ___'] === 'object') {
                             node['___ on ___'][type] = null;
                         }
                     } else {
@@ -1313,7 +1321,7 @@ var ADSAFE = (function () {
                 reject_global(this);
                 star = this.___star___;
                 return new Bunch(quest(parse_query(string_check(text), id),
-                    this.___nodes___));
+                        this.___nodes___));
             },
             remove: function () {
                 reject_global(this);
@@ -1348,7 +1356,7 @@ var ADSAFE = (function () {
                 } else if (replacement instanceof Array) {
                     if (replacement.length !== b.length) {
                         error('ADsafe: Array length: ' +
-                            b.length + '-' + value.length);
+                                b.length + '-' + value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1376,11 +1384,15 @@ var ADSAFE = (function () {
                         purge_event_handlers(node);
                         parent = node.parentNode;
                         if (parent) {
-                            newnode = flag ? rep[0].cloneNode(true) : rep[0];
+                            newnode = flag 
+                            ? rep[0].cloneNode(true) 
+                            : rep[0];
                             parent.replaceChild(newnode, node);
                             for (j = 1; j < rep.length; j += 1) {
                                 node = newnode;
-                                newnode = flag ? rep[j].clone(true) : rep[j];
+                                newnode = flag 
+                                ? rep[j].clone(true) 
+                                : rep[j];
                                 parent.insertBefore(newnode, node.nextSibling);
                             }
                             flag = true;
@@ -1410,8 +1422,8 @@ var ADSAFE = (function () {
                         end = node.selectionEnd;
                         old = node.value;
                         node.value = old.slice(0, start) + string + old.slice(end);
-                        node.selectionStart = node.selectionEnd = start +
-                            string.length;
+                        node.selectionStart = start + string.length;
+                        node.selectionEnd = start + string.length;
                         node.focus();
                     } else {
                         range = node.createTextRange();
@@ -1430,7 +1442,7 @@ var ADSAFE = (function () {
                 if (reject_name(name)) {
                     error("ADsafe style violation.");
                 }
-                if (value === undefined || /url/i.test(string_check(value))) {
+                if (value === undefined || (/url/i.test(string_check(value)))) {
                     error();
                 }
                 var b = this.___nodes___,
@@ -1440,7 +1452,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' +
-                            b.length + '-' + value.length);
+                                b.length + '-' + value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1452,7 +1464,8 @@ var ADSAFE = (function () {
                             if (name !== 'float') {
                                 node.style[name] = v;
                             } else {
-                                node.style.cssFloat = node.style.styleFloat = v;
+                                node.style.cssFloat = v;
+                                node.style.styleFloat = v;
                             }
                         }
                     }
@@ -1467,7 +1480,8 @@ var ADSAFE = (function () {
                             if (name !== 'float') {
                                 node.style[name] = v;
                             } else {
-                                node.style.cssFloat = node.style.styleFloat = v;
+                                node.style.cssFloat = v;
+                                node.style.styleFloat = v;
                             }
                         }
                     }
@@ -1511,7 +1525,7 @@ var ADSAFE = (function () {
                 if (value instanceof Array) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length +
-                            '-' + value.length);
+                                '-' + value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1586,8 +1600,8 @@ var ADSAFE = (function () {
         dom = {
             append: function (bunch) {
                 var b = typeof bunch === 'string'
-                        ? [document.createTextNode(bunch)]
-                        : bunch.___nodes___,
+                    ? [document.createTextNode(bunch)]
+                    : bunch.___nodes___,
                     i,
                     n;
                 for (i = 0; i < b.length; i += 1) {
@@ -1696,10 +1710,16 @@ var ADSAFE = (function () {
             root.addEventListener('dblclick', dom_event, true);
             root.addEventListener('keypress', dom_event, true);
         } else {
-            root.onfocusin       = root.onfocusout  = root.onmouseout  =
-                root.onmousedown = root.onmousemove = root.onmouseup   =
-                root.onmouseover = root.onclick     = root.ondblclick  =
-                root.onkeypress  = dom_event;
+            root.onclick = dom_event;
+            root.ondblclick = dom_event;
+            root.onfocusin = dom_event;
+            root.onfocusout = dom_event;
+            root.onkeypress = dom_event;
+            root.onmouseout = dom_event;
+            root.onmousedown = dom_event;
+            root.onmousemove = dom_event;
+            root.onmouseover = dom_event;
+            root.onmouseup = dom_event;
         }
         return [dom, Bunch.prototype];
     }
@@ -1717,7 +1737,7 @@ var ADSAFE = (function () {
 
         get: function (object, name) {
             reject_global(object);
-            if (arguments.length === 2 && !reject_property(object, name)) {
+            if (!reject_property(object, name)) {
                 return object[name];
             }
             error();
@@ -1760,7 +1780,6 @@ var ADSAFE = (function () {
             } while (i >= 0);
             root = make_root(root, id);
             dom = root[0];
-
 
 // If the page has registered interceptors, call then.
 
@@ -1814,20 +1833,9 @@ var ADSAFE = (function () {
             return Object.prototype.toString.apply(value) === '[object Array]';
         },
 
-
-
 //  ADSAFE.keys returns an array of keys.
 
-        keys: Object.keys || function (object) {
-            var key, keys = [];
-            for (key in object) {
-                if (owns(object, key)) {
-                    keys.push(key);
-                }
-            }
-            return keys;
-        },
-
+        keys: Object.keys,
 
 //  ADSAFE.later calls a function at a later time.
 
@@ -1838,7 +1846,6 @@ var ADSAFE = (function () {
                 error();
             }
         },
-
 
 //  ADSAFE.lib allows an approved ADsafe library to make itself available
 //  to a widget. The library provides a name and a function. The result of
@@ -1851,37 +1858,34 @@ var ADSAFE = (function () {
             adsafe_lib[name] = f(adsafe_lib);
         },
 
-
 //  ADSAFE.log is a debugging aid that spams text to the browser's log.
 //  Overwrite this function to send log matter somewhere else.
 
         log: function log(s) {
             if (window.console) {
-                console.log(s);        /* Firebug */
+                console.log(s);
             } else if (typeof Debug === 'object') {
                 Debug.writeln(s);      /* IE */
-            } else if (typeof opera === 'opera') {
+            } else {
                 opera.postError(s);    /* Opera */
             }
         },
 
-
 //  ADSAFE.remove deletes a value from an object.
 
         remove: function (object, name) {
-            if (arguments.length === 2 && !reject_property(object, name)) {
+            if (!reject_property(object, name)) {
                 delete object[name];
                 return;
             }
             error();
         },
 
-
 //  ADSAFE.set stores a value in an object.
 
         set: function (object, name, value) {
             reject_global(object);
-            if (arguments.length === 3 && !reject_property(object, name)) {
+            if (!reject_property(object, name)) {
                 object[name] = value;
                 return;
             }
