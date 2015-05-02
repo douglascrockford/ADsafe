@@ -1,5 +1,5 @@
 // adsafe.js
-// 2015-02-24
+// 2015-05-01
 
 //    Public Domain.
 
@@ -291,8 +291,8 @@ ADSAFE = (function () {
             query = [],     // The resulting query array
             selector,
             qx = id
-            ? /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/
-            : /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?\=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
+                ? /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/
+                : /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
 
 // Loop over all of the selectors in the text.
 
@@ -330,15 +330,15 @@ ADSAFE = (function () {
 // The selector is in brackets.
 
                 selector = match[3] 
-                ? {
-                    op: '[' + match[3],
-                    name: match[2],
-                    value: match[4]
-                } 
-                : {
-                    op: '[',
-                    name: match[2]
-                };
+                    ? {
+                        op: '[' + match[3],
+                        name: match[2],
+                        value: match[4]
+                    } 
+                    : {
+                        op: '[',
+                        name: match[2]
+                    };
             } else if (match[5]) {
 
 // The selector is an id.
@@ -395,8 +395,8 @@ ADSAFE = (function () {
             try {
                 array = Array.prototype.slice.call(nodelist, 0);
                 result = result.length 
-                ? result.concat(array) 
-                : array;
+                    ? result.concat(array) 
+                    : array;
             } catch (ignore) {
                 length = nodelist.length;
                 for (i = 0; i < length; i += 1) {
@@ -446,7 +446,8 @@ ADSAFE = (function () {
 
     pecker = {
         '.': function (node) {
-            return (' ' + node.className + ' ').indexOf(' ' + name + ' ') >= 0;
+            var classy = ' ' + node.className + ' ';
+            return classy.indexOf(' ' + name + ' ') >= 0;
         },
         '&': function (node) {
             return node.name === name;
@@ -482,13 +483,17 @@ ADSAFE = (function () {
         },
         '[~=': function (node) {
             var member = node[name];
-            return typeof member === 'string' &&
-                    (' ' + member + ' ').indexOf(' ' + value + ' ') >= 0;
+            if (typeof member === 'string') {
+                member = ' ' + member + ' ';
+                return member.indexOf(' ' + value + ' ') >= 0;
+            }
         },
         '[|=': function (node) {
             var member = node[name];
-            return typeof member === 'string' &&
-                    ('-' + member + '-').indexOf('-' + value + '-') >= 0;
+            if (typeof member === 'string') {
+                member = '-' + member + '-';
+                return member.indexOf('-' + value + '-') >= 0;
+            }
         },
         ':blur': function (node) {
             return node !== has_focus;
@@ -807,8 +812,8 @@ ADSAFE = (function () {
                         if (rep) {
                             for (j = 0; j < rep.length; j += 1) {
                                 node.appendChild(flag
-                                ? rep[j].cloneNode(true)
-                                : rep[j]);
+                                    ? rep[j].cloneNode(true)
+                                    : rep[j]);
                             }
                             flag = true;
                         } else {
@@ -899,8 +904,8 @@ ADSAFE = (function () {
                     a.push(new Bunch(c));
                 }
                 return n 
-                ? a 
-                : a[0];
+                    ? a 
+                    : a[0];
             },
             count: function () {
                 reject_global(this);
@@ -1152,9 +1157,9 @@ ADSAFE = (function () {
                     node = b[i];
                     if (node.tagName) {
                         s = name !== 'float'
-                        ? getStyleObject(node)[name]
-                        : getStyleObject(node).cssFloat ||
-                                getStyleObject(node).styleFloat;
+                            ? getStyleObject(node)[name]
+                            : getStyleObject(node).cssFloat ||
+                                    getStyleObject(node).styleFloat;
                         if (typeof s === 'string') {
                             a[i] = s;
                         }
@@ -1171,8 +1176,8 @@ ADSAFE = (function () {
                 for (i = 0; i < b.length; i += 1) {
                     tagName = b[i].tagName;
                     a[i] = typeof tagName === 'string' 
-                    ? tagName.toLowerCase() 
-                    : tagName;
+                        ? tagName.toLowerCase() 
+                        : tagName;
                 }
                 return a;
             },
@@ -1385,14 +1390,14 @@ ADSAFE = (function () {
                         parent = node.parentNode;
                         if (parent) {
                             newnode = flag 
-                            ? rep[0].cloneNode(true) 
-                            : rep[0];
+                                ? rep[0].cloneNode(true) 
+                                : rep[0];
                             parent.replaceChild(newnode, node);
                             for (j = 1; j < rep.length; j += 1) {
                                 node = newnode;
                                 newnode = flag 
-                                ? rep[j].clone(true) 
-                                : rep[j];
+                                    ? rep[j].clone(true) 
+                                    : rep[j];
                                 parent.insertBefore(newnode, node.nextSibling);
                             }
                             flag = true;
@@ -1600,8 +1605,8 @@ ADSAFE = (function () {
         dom = {
             append: function (bunch) {
                 var b = typeof bunch === 'string'
-                    ? [document.createTextNode(bunch)]
-                    : bunch.___nodes___,
+                        ? [document.createTextNode(bunch)]
+                        : bunch.___nodes___,
                     i,
                     n;
                 for (i = 0; i < b.length; i += 1) {
