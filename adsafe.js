@@ -1,5 +1,5 @@
 // adsafe.js
-// 2015-05-01
+// 2016-01-13
 
 //    Public Domain.
 
@@ -20,7 +20,7 @@
 
 /*global window*/
 
-/*jslint browser, devel, for, this 
+/*jslint browser, devel, for, this
 */
 
 /*property
@@ -59,118 +59,118 @@ var ADSAFE;
 ADSAFE = (function () {
     'use strict';
 
-    var adsafe_id,      // The id of the current widget
-        adsafe_lib,     // The script libraries loaded by the current widget
+    var adsafe_id;      // The id of the current widget
+    var adsafe_lib;     // The script libraries loaded by the current widget
 
 // These member names are banned from guest scripts. The ADSAFE.get and
 // ADSAFE.put methods will not allow access to these properties.
 
-        banned = {
-            arguments: true,
-            callee: true,
-            caller: true,
-            constructor: true,
-            eval: true,
-            prototype: true,
-            stack: true,
-            unwatch: true,
-            valueOf: true,
-            watch: true
-        },
+    var banned = {
+        arguments: true,
+        callee: true,
+        caller: true,
+        constructor: true,
+        eval: true,
+        prototype: true,
+        stack: true,
+        unwatch: true,
+        valueOf: true,
+        watch: true
+    };
 
-        cache_style_object,
-        cache_style_node,
-        defaultView = document.defaultView,
-        ephemeral,
-        flipflop,       // Used in :even/:odd processing
-        has_focus,
-        hunter,         // Set of hunter patterns
-        interceptors = [],
+    var cache_style_object;
+    var cache_style_node;
+    var defaultView = document.defaultView;
+    var ephemeral;
+    var flipflop;       // Used in :even/:odd processing
+    var has_focus;
+    var hunter;         // Set of hunter patterns
+    var interceptors = [];
 
-        makeableTagName = {
+    var makeableTagName = {
 
 // This is the whitelist of elements that may be created with the .tag(tagName)
 // method.
 
-            a: true,
-            abbr: true,
-            acronym: true,
-            address: true,
-            area: true,
-            b: true,
-            bdo: true,
-            big: true,
-            blockquote: true,
-            br: true,
-            button: true,
-            canvas: true,
-            caption: true,
-            center: true,
-            cite: true,
-            code: true,
-            col: true,
-            colgroup: true,
-            dd: true,
-            del: true,
-            dfn: true,
-            dir: true,
-            div: true,
-            dl: true,
-            dt: true,
-            em: true,
-            fieldset: true,
-            font: true,
-            form: true,
-            h1: true,
-            h2: true,
-            h3: true,
-            h4: true,
-            h5: true,
-            h6: true,
-            hr: true,
-            i: true,
-            img: true,
-            input: true,
-            ins: true,
-            kbd: true,
-            label: true,
-            legend: true,
-            li: true,
-            map: true,
-            menu: true,
-            object: true,
-            ol: true,
-            optgroup: true,
-            option: true,
-            p: true,
-            pre: true,
-            q: true,
-            samp: true,
-            select: true,
-            small: true,
-            span: true,
-            strong: true,
-            sub: true,
-            sup: true,
-            table: true,
-            tbody: true,
-            td: true,
-            textarea: true,
-            tfoot: true,
-            th: true,
-            thead: true,
-            tr: true,
-            tt: true,
-            u: true,
-            ul: true,
-            var: true
-        },
-        name,
-        pecker,     // set of pecker patterns
-        result,
-        star,
-        the_range,
-        value;
+        a: true,
+        abbr: true,
+        acronym: true,
+        address: true,
+        area: true,
+        b: true,
+        bdo: true,
+        big: true,
+        blockquote: true,
+        br: true,
+        button: true,
+        canvas: true,
+        caption: true,
+        center: true,
+        cite: true,
+        code: true,
+        col: true,
+        colgroup: true,
+        dd: true,
+        del: true,
+        dfn: true,
+        dir: true,
+        div: true,
+        dl: true,
+        dt: true,
+        em: true,
+        fieldset: true,
+        font: true,
+        form: true,
+        h1: true,
+        h2: true,
+        h3: true,
+        h4: true,
+        h5: true,
+        h6: true,
+        hr: true,
+        i: true,
+        img: true,
+        input: true,
+        ins: true,
+        kbd: true,
+        label: true,
+        legend: true,
+        li: true,
+        map: true,
+        menu: true,
+        object: true,
+        ol: true,
+        optgroup: true,
+        option: true,
+        p: true,
+        pre: true,
+        q: true,
+        samp: true,
+        select: true,
+        small: true,
+        span: true,
+        strong: true,
+        sub: true,
+        sup: true,
+        table: true,
+        tbody: true,
+        td: true,
+        textarea: true,
+        tfoot: true,
+        th: true,
+        thead: true,
+        tr: true,
+        tt: true,
+        u: true,
+        ul: true,
+        var: true
+    };
+    var name;
+    var pecker;     // set of pecker patterns
+    var result;
+    var star;
+    var the_range;
+    var value;
 
 
 //  The error function is called if there is a violation or confusion.
@@ -287,12 +287,12 @@ ADSAFE = (function () {
 
 // A name must be all lower case and may contain digits, -, or _.
 
-        var match,          // A match array
-            query = [],     // The resulting query array
-            selector,
-            qx = id
-                ? /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/
-                : /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
+        var match;          // A match array
+        var query = [];     // The resulting query array
+        var selector;
+        var qx = (id)
+            ? /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~\|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/
+            : /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~\|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
 
 // Loop over all of the selectors in the text.
 
@@ -329,12 +329,12 @@ ADSAFE = (function () {
 
 // The selector is in brackets.
 
-                selector = match[3] 
+                selector = (match[3])
                     ? {
                         op: '[' + match[3],
                         name: match[2],
                         value: match[4]
-                    } 
+                    }
                     : {
                         op: '[',
                         name: match[2]
@@ -385,7 +385,10 @@ ADSAFE = (function () {
 // These functions implement the hunter behaviors.
 
         '': function (node) {
-            var array, nodelist = node.getElementsByTagName(name), i, length;
+            var array;
+            var nodelist = node.getElementsByTagName(name);
+            var i;
+            var length;
 
 // getElementsByTagName produces a nodeList, which is one of the world's most
 // inefficient data structures. It is so slow that JavaScript's pseudo arrays
@@ -394,8 +397,8 @@ ADSAFE = (function () {
 
             try {
                 array = Array.prototype.slice.call(nodelist, 0);
-                result = result.length 
-                    ? result.concat(array) 
+                result = (result.length)
+                    ? result.concat(array)
                     : array;
             } catch (ignore) {
                 length = nodelist.length;
@@ -431,7 +434,9 @@ ADSAFE = (function () {
             }
         },
         '/': function (node) {
-            var nodes = node.childNodes, i, length = nodes.length;
+            var nodes = node.childNodes;
+            var i;
+            var length = nodes.length;
             for (i = 0; i < length; i += 1) {
                 result.push(nodes[i]);
             }
@@ -548,7 +553,10 @@ ADSAFE = (function () {
 
 
     function quest(query, nodes) {
-        var selector, func, i, j;
+        var selector;
+        var func;
+        var i;
+        var j;
 
 // Step through each selector.
 
@@ -629,151 +637,151 @@ ADSAFE = (function () {
             star = false;
         }
 
-        var allow_focus = true,
-            dom,
-            dom_event = function (e) {
-                var key,
-                    target,
-                    that,
-                    the_event,
-                    the_target,
-                    the_actual_event = e || event,
-                    type = the_actual_event.type;
+        var allow_focus = true;
+        var dom;
+        var dom_event = function (ev) {
+            var key;
+            var target;
+            var that;
+            var the_event;
+            var the_target;
+            var the_actual_event = ev || event;
+            var type = the_actual_event.type;
 
 // Get the target node and wrap it in a bunch.
 
-                the_target = the_actual_event.target || the_actual_event.srcElement;
-                target = new Bunch([the_target]);
-                that = target;
+            the_target = the_actual_event.target || the_actual_event.srcElement;
+            target = new Bunch([the_target]);
+            that = target;
 
 // Use the PPK hack to make focus bubbly on IE.
 // When a widget has focus, it can use the focus method.
 
-                switch (type) {
-                case 'mousedown':
-                    allow_focus = true;
-                    if (document.selection) {
-                        the_range = document.selection.createRange();
-                    }
+            switch (type) {
+            case 'mousedown':
+                allow_focus = true;
+                if (document.selection) {
+                    the_range = document.selection.createRange();
+                }
+                break;
+            case 'focus':
+            case 'focusin':
+                allow_focus = true;
+                has_focus = the_target;
+                the_actual_event.cancelBubble = false;
+                type = 'focus';
+                break;
+            case 'blur':
+            case 'focusout':
+                allow_focus = false;
+                has_focus = null;
+                type = 'blur';
+                break;
+            case 'keypress':
+                allow_focus = true;
+                has_focus = the_target;
+                key = String.fromCharCode(the_actual_event.charCode ||
+                        the_actual_event.keyCode);
+                switch (key) {
+                case '\u000d':
+                case '\u000a':
+                    type = 'enterkey';
                     break;
-                case 'focus':
-                case 'focusin':
-                    allow_focus = true;
-                    has_focus = the_target;
-                    the_actual_event.cancelBubble = false;
-                    type = 'focus';
+                case '\u001b':
+                    type = 'escapekey';
                     break;
-                case 'blur':
-                case 'focusout':
-                    allow_focus = false;
-                    has_focus = null;
-                    type = 'blur';
-                    break;
-                case 'keypress':
-                    allow_focus = true;
-                    has_focus = the_target;
-                    key = String.fromCharCode(the_actual_event.charCode ||
-                            the_actual_event.keyCode);
-                    switch (key) {
-                    case '\u000d':
-                    case '\u000a':
-                        type = 'enterkey';
-                        break;
-                    case '\u001b':
-                        type = 'escapekey';
-                        break;
-                    }
-                    break;
+                }
+                break;
 
 // This is a workaround for Safari.
 
-                case 'click':
-                    allow_focus = true;
-                    break;
-                }
-                if (the_actual_event.cancelBubble &&
-                        the_actual_event.stopPropagation) {
-                    the_actual_event.stopPropagation();
-                }
+            case 'click':
+                allow_focus = true;
+                break;
+            }
+            if (the_actual_event.cancelBubble &&
+                    the_actual_event.stopPropagation) {
+                the_actual_event.stopPropagation();
+            }
 
 // Make the event object.
 
-                the_event = {
-                    altKey: the_actual_event.altKey,
-                    ctrlKey: the_actual_event.ctrlKey,
-                    bubble: function () {
+            the_event = {
+                altKey: the_actual_event.altKey,
+                ctrlKey: the_actual_event.ctrlKey,
+                bubble: function () {
 
 // Bubble up. Get the parent of that node. It becomes the new that.
 // getParent throws when bubbling is not possible.
 
-                        try {
-                            var parent = that.getParent(),
-                                b = parent.___nodes___[0];
-                            that = parent;
-                            the_event.that = that;
+                    try {
+                        var parent = that.getParent();
+                        var b = parent.___nodes___[0];
+                        that = parent;
+                        the_event.that = that;
 
 // If that node has an event handler, fire it. Otherwise, bubble up.
 
-                            if (b['___ on ___'] &&
-                                    b['___ on ___'][type]) {
-                                that.fire(the_event);
-                            } else {
-                                the_event.bubble();
-                            }
-                        } catch (e) {
-                            error(e);
+                        if (b['___ on ___'] &&
+                                b['___ on ___'][type]) {
+                            that.fire(the_event);
+                        } else {
+                            the_event.bubble();
                         }
-                    },
-                    key: key,
-                    preventDefault: function () {
-                        if (the_actual_event.preventDefault) {
-                            the_actual_event.preventDefault();
-                        }
-                        the_actual_event.returnValue = false;
-                    },
-                    shiftKey: the_actual_event.shiftKey,
-                    target: target,
-                    that: that,
-                    type: type,
-                    x: the_actual_event.clientX,
-                    y: the_actual_event.clientY
-                };
+                    } catch (e) {
+                        error(e);
+                    }
+                },
+                key: key,
+                preventDefault: function () {
+                    if (the_actual_event.preventDefault) {
+                        the_actual_event.preventDefault();
+                    }
+                    the_actual_event.returnValue = false;
+                },
+                shiftKey: the_actual_event.shiftKey,
+                target: target,
+                that: that,
+                type: type,
+                x: the_actual_event.clientX,
+                y: the_actual_event.clientY
+            };
 
 // If the target has event handlers, then fire them. Otherwise, bubble up.
 
-                if (the_target['___ on ___'] &&
-                        the_target['___ on ___'][the_event.type]) {
-                    target.fire(the_event);
-                } else {
-                    while (true) {
-                        the_target = the_target.parentNode;
-                        if (!the_target) {
-                            break;
-                        }
-                        if (the_target['___ on ___'] &&
-                                the_target['___ on ___'][the_event.type]) {
-                            that = new Bunch([the_target]);
-                            the_event.that = that;
-                            that.fire(the_event);
-                            break;
-                        }
-                        if (the_target['___adsafe root___']) {
-                            break;
-                        }
+            if (the_target['___ on ___'] &&
+                    the_target['___ on ___'][the_event.type]) {
+                target.fire(the_event);
+            } else {
+                while (true) {
+                    the_target = the_target.parentNode;
+                    if (!the_target) {
+                        break;
+                    }
+                    if (the_target['___ on ___'] &&
+                            the_target['___ on ___'][the_event.type]) {
+                        that = new Bunch([the_target]);
+                        the_event.that = that;
+                        that.fire(the_event);
+                        break;
+                    }
+                    if (the_target['___adsafe root___']) {
+                        break;
                     }
                 }
-                if (the_event.type === 'escapekey') {
-                    if (ephemeral) {
-                        ephemeral.remove();
-                    }
-                    ephemeral = null;
+            }
+            if (the_event.type === 'escapekey') {
+                if (ephemeral) {
+                    ephemeral.remove();
                 }
-                that = null;
-                the_actual_event = null;
-                the_event = null;
-                the_target = null;
-                return;
-            };
+                ephemeral = null;
+            }
+            that = null;
+            the_actual_event = null;
+            the_event = null;
+            the_target = null;
+            return;
+        };
 
 // Mark the node as a root. This prevents event bubbling from propagating
 // past it.
@@ -783,16 +791,16 @@ ADSAFE = (function () {
         Bunch.prototype = {
             append: function (appendage) {
                 reject_global(this);
-                var b = this.___nodes___,
-                    flag = false,
-                    i,
-                    j,
-                    node,
-                    rep;
+                var b = this.___nodes___;
+                var flag = false;
+                var i;
+                var j;
+                var node;
+                var rep;
                 if (b.length === 0 || !appendage) {
                     return this;
                 }
-                if (appendage instanceof Array) {
+                if (Array.isArray(appendage)) {
                     if (appendage.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
                                 value.length);
@@ -811,7 +819,7 @@ ADSAFE = (function () {
                         node = b[i];
                         if (rep) {
                             for (j = 0; j < rep.length; j += 1) {
-                                node.appendChild(flag
+                                node.appendChild((flag)
                                     ? rep[j].cloneNode(true)
                                     : rep[j]);
                             }
@@ -825,7 +833,9 @@ ADSAFE = (function () {
             },
             blur: function () {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
+                var b = this.___nodes___;
+                var i;
+                var node;
                 has_focus = null;
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
@@ -837,8 +847,10 @@ ADSAFE = (function () {
             },
             check: function (value) {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
-                if (value instanceof Array) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                if (Array.isArray(value)) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
                                 value.length);
@@ -861,8 +873,10 @@ ADSAFE = (function () {
             },
             'class': function (value) {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
-                if (value instanceof Array) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                if (Array.isArray(value)) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
                                 value.length);
@@ -890,12 +904,12 @@ ADSAFE = (function () {
                 return this;
             },
             clone: function (deep, n) {
-                var a = [],
-                    b = this.___nodes___,
-                    c,
-                    i,
-                    j,
-                    k = n || 1;
+                var a = [];
+                var b = this.___nodes___;
+                var c;
+                var i;
+                var j;
+                var k = n || 1;
                 for (i = 0; i < k; i += 1) {
                     c = [];
                     for (j = 0; j < b.length; j += 1) {
@@ -903,8 +917,8 @@ ADSAFE = (function () {
                     }
                     a.push(new Bunch(c));
                 }
-                return n 
-                    ? a 
+                return (n)
+                    ? a
                     : a[0];
             },
             count: function () {
@@ -913,7 +927,8 @@ ADSAFE = (function () {
             },
             each: function (func) {
                 reject_global(this);
-                var b = this.___nodes___, i;
+                var b = this.___nodes___;
+                var i;
                 if (typeof func === 'function') {
                     for (i = 0; i < b.length; i += 1) {
                         func(new Bunch([b[i]]));
@@ -924,8 +939,10 @@ ADSAFE = (function () {
             },
             empty: function () {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
-                if (value instanceof Array) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                if (Array.isArray(value)) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
                                 value.length);
@@ -950,8 +967,10 @@ ADSAFE = (function () {
             },
             enable: function (enable) {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
-                if (enable instanceof Array) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                if (Array.isArray(enable)) {
                     if (enable.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
                                 enable.length);
@@ -982,7 +1001,9 @@ ADSAFE = (function () {
             },
             explode: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     a[i] = new Bunch([b[i]]);
                 }
@@ -997,14 +1018,14 @@ ADSAFE = (function () {
     // method that match the event name will be invoked.
 
                 reject_global(this);
-                var array,
-                    b,
-                    i,
-                    j,
-                    n,
-                    node,
-                    on,
-                    type;
+                var array;
+                var b;
+                var i;
+                var j;
+                var n;
+                var node;
+                var on;
+                var type;
 
                 if (typeof event === 'string') {
                     type = event;
@@ -1053,7 +1074,9 @@ ADSAFE = (function () {
             },
             getChecks: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     a[i] = b[i].checked;
                 }
@@ -1064,7 +1087,9 @@ ADSAFE = (function () {
             },
             getClasses: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     a[i] = b[i].className;
                 }
@@ -1075,7 +1100,9 @@ ADSAFE = (function () {
             },
             getMarks: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     a[i] = b[i]['_adsafe mark_'];
                 }
@@ -1086,7 +1113,9 @@ ADSAFE = (function () {
             },
             getNames: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     a[i] = b[i].name;
                 }
@@ -1097,7 +1126,9 @@ ADSAFE = (function () {
             },
             getOffsetHeights: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     a[i] = b[i].offsetHeight;
                 }
@@ -1108,7 +1139,9 @@ ADSAFE = (function () {
             },
             getOffsetWidths: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     a[i] = b[i].offsetWidth;
                 }
@@ -1116,7 +1149,10 @@ ADSAFE = (function () {
             },
             getParent: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i, n;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
+                var n;
                 for (i = 0; i < b.length; i += 1) {
                     n = b[i].parentNode;
                     if (n['___adsafe root___']) {
@@ -1128,7 +1164,11 @@ ADSAFE = (function () {
             },
             getSelection: function () {
                 reject_global(this);
-                var b = this.___nodes___, end, node, start, range;
+                var b = this.___nodes___;
+                var end;
+                var node;
+                var start;
+                var range;
                 if (b.length === 1 && allow_focus) {
                     node = b[0];
                     if (typeof node.selectionStart === 'number') {
@@ -1152,11 +1192,15 @@ ADSAFE = (function () {
                 if (reject_name(name)) {
                     error("ADsafe style violation.");
                 }
-                var a = [], b = this.___nodes___, i, node, s;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
+                var node;
+                var s;
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
                     if (node.tagName) {
-                        s = name !== 'float'
+                        s = (name !== 'float')
                             ? getStyleObject(node)[name]
                             : getStyleObject(node).cssFloat ||
                                     getStyleObject(node).styleFloat;
@@ -1172,11 +1216,14 @@ ADSAFE = (function () {
             },
             getTagNames: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i, tagName;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
+                var tagName;
                 for (i = 0; i < b.length; i += 1) {
                     tagName = b[i].tagName;
-                    a[i] = typeof tagName === 'string' 
-                        ? tagName.toLowerCase() 
+                    a[i] = (typeof tagName === 'string')
+                        ? tagName.toLowerCase()
                         : tagName;
                 }
                 return a;
@@ -1186,7 +1233,9 @@ ADSAFE = (function () {
             },
             getTitles: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     a[i] = b[i].title;
                 }
@@ -1197,7 +1246,10 @@ ADSAFE = (function () {
             },
             getValues: function () {
                 reject_global(this);
-                var a = [], b = this.___nodes___, i, node;
+                var a = [];
+                var b = this.___nodes___;
+                var i;
+                var node;
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
                     if (node.nodeName === '#text') {
@@ -1214,8 +1266,10 @@ ADSAFE = (function () {
             },
             indeterminate: function (value) {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
-                if (value instanceof Array) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                if (Array.isArray(value)) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
                                 value.length);
@@ -1241,8 +1295,10 @@ ADSAFE = (function () {
             },
             mark: function (value) {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
-                if (value instanceof Array) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                if (Array.isArray(value)) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length + '-' +
                                 value.length);
@@ -1265,7 +1321,9 @@ ADSAFE = (function () {
             },
             off: function (type) {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
+                var b = this.___nodes___;
+                var i;
+                var node;
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
                     if (typeof type === 'string') {
@@ -1284,7 +1342,11 @@ ADSAFE = (function () {
                     error();
                 }
 
-                var b = this.___nodes___, i, node, on, ontype;
+                var b = this.___nodes___;
+                var i;
+                var node;
+                var on;
+                var ontype;
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
 
@@ -1316,7 +1378,8 @@ ADSAFE = (function () {
             },
             protect: function () {
                 reject_global(this);
-                var b = this.___nodes___, i;
+                var b = this.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     b[i]['___adsafe root___'] = '___adsafe root___';
                 }
@@ -1334,14 +1397,14 @@ ADSAFE = (function () {
             },
             replace: function (replacement) {
                 reject_global(this);
-                var b = this.___nodes___,
-                    flag = false,
-                    i,
-                    j,
-                    newnode,
-                    node,
-                    parent,
-                    rep;
+                var b = this.___nodes___;
+                var flag = false;
+                var i;
+                var j;
+                var newnode;
+                var node;
+                var parent;
+                var rep;
                 if (b.length === 0) {
                     return;
                 }
@@ -1358,7 +1421,7 @@ ADSAFE = (function () {
                             node.parentNode.removeChild(node);
                         }
                     }
-                } else if (replacement instanceof Array) {
+                } else if (Array.isArray(replacement)) {
                     if (replacement.length !== b.length) {
                         error('ADsafe: Array length: ' +
                                 b.length + '-' + value.length);
@@ -1389,14 +1452,14 @@ ADSAFE = (function () {
                         purge_event_handlers(node);
                         parent = node.parentNode;
                         if (parent) {
-                            newnode = flag 
-                                ? rep[0].cloneNode(true) 
+                            newnode = (flag)
+                                ? rep[0].cloneNode(true)
                                 : rep[0];
                             parent.replaceChild(newnode, node);
                             for (j = 1; j < rep.length; j += 1) {
                                 node = newnode;
-                                newnode = flag 
-                                    ? rep[j].clone(true) 
+                                newnode = (flag)
+                                    ? rep[j].clone(true)
                                     : rep[j];
                                 parent.insertBefore(newnode, node.nextSibling);
                             }
@@ -1419,7 +1482,12 @@ ADSAFE = (function () {
             selection: function (string) {
                 reject_global(this);
                 string_check(string);
-                var b = this.___nodes___, end, node, old, start, range;
+                var b = this.___nodes___;
+                var end;
+                var node;
+                var old;
+                var start;
+                var range;
                 if (b.length === 1 && allow_focus) {
                     node = b[0];
                     if (typeof node.selectionStart === 'number') {
@@ -1450,11 +1518,11 @@ ADSAFE = (function () {
                 if (value === undefined || (/url/i.test(string_check(value)))) {
                     error();
                 }
-                var b = this.___nodes___,
-                    i,
-                    node,
-                    v;
-                if (value instanceof Array) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                var v;
+                if (Array.isArray(value)) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' +
                                 b.length + '-' + value.length);
@@ -1514,8 +1582,9 @@ ADSAFE = (function () {
             },
             text: function (text) {
                 reject_global(this);
-                var a, i;
-                if (text instanceof Array) {
+                var a;
+                var i;
+                if (Array.isArray(text)) {
                     a = [];
                     for (i = 0; i < text.length; i += 1) {
                         a[i] = document.createTextNode(string_check(text[i]));
@@ -1526,8 +1595,10 @@ ADSAFE = (function () {
             },
             title: function (value) {
                 reject_global(this);
-                var b = this.___nodes___, i, node;
-                if (value instanceof Array) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                if (Array.isArray(value)) {
                     if (value.length !== b.length) {
                         error('ADsafe: Array length: ' + b.length +
                                 '-' + value.length);
@@ -1554,8 +1625,10 @@ ADSAFE = (function () {
                 if (value === undefined) {
                     error();
                 }
-                var b = this.___nodes___, i, node;
-                if (value instanceof Array && b.length === value.length) {
+                var b = this.___nodes___;
+                var i;
+                var node;
+                if (Array.isArray(value) && b.length === value.length) {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         if (node.tagName) {
@@ -1604,11 +1677,11 @@ ADSAFE = (function () {
 
         dom = {
             append: function (bunch) {
-                var b = typeof bunch === 'string'
-                        ? [document.createTextNode(bunch)]
-                        : bunch.___nodes___,
-                    i,
-                    n;
+                var b = (typeof bunch === 'string')
+                    ? [document.createTextNode(bunch)]
+                    : bunch.___nodes___;
+                var i;
+                var n;
                 for (i = 0; i < b.length; i += 1) {
                     n = b[i];
                     if (typeof n === 'string' || typeof n === 'number') {
@@ -1622,7 +1695,8 @@ ADSAFE = (function () {
                 if (!array || !array.length) {
                     error('ADsafe: Bad combination.');
                 }
-                var b = array[0].___nodes___, i;
+                var b = array[0].___nodes___;
+                var i;
                 for (i = 0; i < array.length; i += 1) {
                     b = b.concat(array[i].___nodes___);
                 }
@@ -1642,7 +1716,8 @@ ADSAFE = (function () {
                 return new Bunch([document.createDocumentFragment()]);
             },
             prepend: function (bunch) {
-                var b = bunch.___nodes___, i;
+                var b = bunch.___nodes___;
+                var i;
                 for (i = 0; i < b.length; i += 1) {
                     root.insertBefore(b[i], root.firstChild);
                 }
@@ -1662,9 +1737,9 @@ ADSAFE = (function () {
                 root = null;
             },
             row: function (values) {
-                var tr = document.createElement('tr'),
-                    td,
-                    i;
+                var tr = document.createElement('tr');
+                var td;
+                var i;
                 for (i = 0; i < values.length; i += 1) {
                     td = document.createElement('td');
                     td.appendChild(document.createTextNode(String(values[i])));
@@ -1691,8 +1766,9 @@ ADSAFE = (function () {
                 return new Bunch([node]);
             },
             text: function (text) {
-                var a, i;
-                if (text instanceof Array) {
+                var a;
+                var i;
+                if (Array.isArray(text)) {
                     a = [];
                     for (i = 0; i < text.length; i += 1) {
                         a[i] = document.createTextNode(string_check(text[i]));
@@ -1753,7 +1829,11 @@ ADSAFE = (function () {
 //  will be passed the wrapped dom node and an object containing the libraries.
 
         go: function (id, f) {
-            var dom, fun, root, i, scripts;
+            var dom;
+            var fun;
+            var root;
+            var i;
+            var scripts;
 
 //  If ADSAFE.id was called, the id better match.
 
