@@ -1,5 +1,5 @@
 // adsafe.js
-// 2016-01-13
+// 2016-02-07
 
 //    Public Domain.
 
@@ -57,7 +57,7 @@
 
 var ADSAFE;
 ADSAFE = (function () {
-    'use strict';
+    "use strict";
 
     var adsafe_id;      // The id of the current widget
     var adsafe_lib;     // The script libraries loaded by the current widget
@@ -190,7 +190,7 @@ ADSAFE = (function () {
 //    such abuses.
 
     function string_check(string) {
-        if (typeof string !== 'string') {
+        if (typeof string !== "string") {
             error("ADsafe string violation.");
         }
         return string;
@@ -201,7 +201,7 @@ ADSAFE = (function () {
 //    the owns function.
 
     function owns(object, string) {
-        return object && typeof object === 'object' &&
+        return object && typeof object === "object" &&
                 Object.prototype.hasOwnProperty.call(object, string_check(string));
     }
 
@@ -211,13 +211,13 @@ ADSAFE = (function () {
 //  or strings that start or end with _.
 
     function reject_name(name) {
-        return typeof name !== 'number' && (typeof name !== 'string' ||
-                banned[name] || name.charAt(0) === '_' || name.slice(-1) === '_');
+        return typeof name !== "number" && (typeof name !== "string" ||
+                banned[name] || name.charAt(0) === "_" || name.slice(-1) === "_");
     }
 
 
     function reject_property(object, name) {
-        return typeof object !== 'object' || reject_name(name);
+        return typeof object !== "object" || reject_name(name);
     }
 
 
@@ -237,7 +237,7 @@ ADSAFE = (function () {
         }
         cache_style_node = node;
         cache_style_object =
-                node.currentStyle || defaultView.getComputedStyle(node, '');
+                node.currentStyle || defaultView.getComputedStyle(node, "");
         return cache_style_object;
     }
 
@@ -260,14 +260,14 @@ ADSAFE = (function () {
 
     function purge_event_handlers(node) {
 
-// We attach all event handlers to an '___ on ___' property. The property name
+// We attach all event handlers to an "___ on ___" property. The property name
 // contains spaces to insure that there is no collision with HTML attribues.
 // Keeping the handlers in a single property makes it easy to remove them
 // all at once. Removal is required to avoid memory leakage on IE6 and IE7.
 
         walkTheDOM(node, function (node) {
             if (node.tagName) {
-                node['___ on ___'] = null;
+                node["___ on ___"] = null;
                 node.change = null;
             }
         });
@@ -331,12 +331,12 @@ ADSAFE = (function () {
 
                 selector = (match[3])
                     ? {
-                        op: '[' + match[3],
+                        op: "[" + match[3],
                         name: match[2],
                         value: match[4]
                     }
                     : {
-                        op: '[',
+                        op: "[",
                         name: match[2]
                     };
             } else if (match[5]) {
@@ -348,7 +348,7 @@ ADSAFE = (function () {
                     error("ADsafe: Bad query: " + text);
                 }
                 selector = {
-                    op: '#',
+                    op: "#",
                     name: match[5]
                 };
 
@@ -356,7 +356,7 @@ ADSAFE = (function () {
 
             } else if (match[6]) {
                 selector = {
-                    op: ':' + match[6]
+                    op: ":" + match[6]
                 };
 
 // The selector is one of > + . & _ or a naked tag name
@@ -384,7 +384,7 @@ ADSAFE = (function () {
 
 // These functions implement the hunter behaviors.
 
-        '': function (node) {
+        "": function (node) {
             var array;
             var nodelist = node.getElementsByTagName(name);
             var i;
@@ -407,7 +407,7 @@ ADSAFE = (function () {
                 }
             }
         },
-        '+': function (node) {
+        "+": function (node) {
             node = node.nextSibling;
             name = name.toUpperCase();
             while (node && !node.tagName) {
@@ -417,7 +417,7 @@ ADSAFE = (function () {
                 result.push(node);
             }
         },
-        '>': function (node) {
+        ">": function (node) {
             node = node.firstChild;
             name = name.toUpperCase();
             while (node) {
@@ -427,13 +427,13 @@ ADSAFE = (function () {
                 node = node.nextSibling;
             }
         },
-        '#': function () {
+        "#": function () {
             var n = document.getElementById(name);
             if (n.tagName) {
                 result.push(n);
             }
         },
-        '/': function (node) {
+        "/": function (node) {
             var nodes = node.childNodes;
             var i;
             var length = nodes.length;
@@ -441,7 +441,7 @@ ADSAFE = (function () {
                 result.push(nodes[i]);
             }
         },
-        '*': function (node) {
+        "*": function (node) {
             star = true;
             walkTheDOM(node, function (node) {
                 result.push(node);
@@ -450,69 +450,69 @@ ADSAFE = (function () {
     };
 
     pecker = {
-        '.': function (node) {
-            var classy = ' ' + node.className + ' ';
-            return classy.indexOf(' ' + name + ' ') >= 0;
+        ".": function (node) {
+            var classy = " " + node.className + " ";
+            return classy.indexOf(" " + name + " ") >= 0;
         },
-        '&': function (node) {
+        "&": function (node) {
             return node.name === name;
         },
-        '_': function (node) {
+        "_": function (node) {
             return node.type === name;
         },
-        '[': function (node) {
-            return typeof node[name] === 'string';
+        "[": function (node) {
+            return typeof node[name] === "string";
         },
-        '[=': function (node) {
+        "[=": function (node) {
             var member = node[name];
-            return typeof member === 'string' && member === value;
+            return typeof member === "string" && member === value;
         },
-        '[!=': function (node) {
+        "[!=": function (node) {
             var member = node[name];
-            return typeof member === 'string' && member !== value;
+            return typeof member === "string" && member !== value;
         },
-        '[^=': function (node) {
+        "[^=": function (node) {
             var member = node[name];
-            return typeof member === 'string' &&
+            return typeof member === "string" &&
                     member.slice(0, member.length) === value;
         },
-        '[$=': function (node) {
+        "[$=": function (node) {
             var member = node[name];
-            return typeof member === 'string' &&
+            return typeof member === "string" &&
                     member.slice(-member.length) === value;
         },
-        '[*=': function (node) {
+        "[*=": function (node) {
             var member = node[name];
-            return typeof member === 'string' &&
+            return typeof member === "string" &&
                     member.indexOf(value) >= 0;
         },
-        '[~=': function (node) {
+        "[~=": function (node) {
             var member = node[name];
-            if (typeof member === 'string') {
-                member = ' ' + member + ' ';
-                return member.indexOf(' ' + value + ' ') >= 0;
+            if (typeof member === "string") {
+                member = " " + member + " ";
+                return member.indexOf(" " + value + " ") >= 0;
             }
         },
-        '[|=': function (node) {
+        "[|=": function (node) {
             var member = node[name];
-            if (typeof member === 'string') {
-                member = '-' + member + '-';
-                return member.indexOf('-' + value + '-') >= 0;
+            if (typeof member === "string") {
+                member = "-" + member + "-";
+                return member.indexOf("-" + value + "-") >= 0;
             }
         },
-        ':blur': function (node) {
+        ":blur": function (node) {
             return node !== has_focus;
         },
-        ':checked': function (node) {
+        ":checked": function (node) {
             return node.checked;
         },
-        ':disabled': function (node) {
+        ":disabled": function (node) {
             return node.tagName && node.disabled;
         },
-        ':enabled': function (node) {
+        ":enabled": function (node) {
             return node.tagName && !node.disabled;
         },
-        ':even': function (node) {
+        ":even": function (node) {
             var f;
             if (node.tagName) {
                 f = flipflop;
@@ -521,33 +521,33 @@ ADSAFE = (function () {
             }
             return false;
         },
-        ':focus': function (node) {
+        ":focus": function (node) {
             return node === has_focus;
         },
-        ':hidden': function (node) {
-            return node.tagName && getStyleObject(node).visibility !== 'visible';
+        ":hidden": function (node) {
+            return node.tagName && getStyleObject(node).visibility !== "visible";
         },
-        ':odd': function (node) {
+        ":odd": function (node) {
             if (node.tagName) {
                 flipflop = !flipflop;
                 return flipflop;
             }
             return false;
         },
-        ':tag': function (node) {
+        ":tag": function (node) {
             return node.tagName;
         },
-        ':text': function (node) {
-            return node.nodeName === '#text';
+        ":text": function (node) {
+            return node.nodeName === "#text";
         },
-        ':trim': function (node) {
-            return node.nodeName !== '#text' || (/\W/.test(node.nodeValue));
+        ":trim": function (node) {
+            return node.nodeName !== "#text" || (/\W/.test(node.nodeValue));
         },
-        ':unchecked': function (node) {
+        ":unchecked": function (node) {
             return node.tagName && !node.checked;
         },
-        ':visible': function (node) {
-            return node.tagName && getStyleObject(node).visibility === 'visible';
+        ":visible": function (node) {
+            return node.tagName && getStyleObject(node).visibility === "visible";
         }
     };
 
@@ -569,10 +569,10 @@ ADSAFE = (function () {
 // loop through the the nodes, passing each node to the hunter function.
 // Accumulate all the nodes it finds.
 
-            if (typeof func === 'function') {
+            if (typeof func === "function") {
                 if (star) {
                     error("ADsafe: Query violation: *" + selector.op +
-                            (selector.name || ''));
+                            (selector.name || ""));
                 }
                 result = [];
                 for (j = 0; j < nodes.length; j += 1) {
@@ -586,16 +586,16 @@ ADSAFE = (function () {
                 value = selector.value;
                 flipflop = false;
                 func = pecker[selector.op];
-                if (typeof func !== 'function') {
+                if (typeof func !== "function") {
                     switch (selector.op) {
-                    case ':first':
+                    case ":first":
                         result = nodes.slice(0, 1);
                         break;
-                    case ':rest':
+                    case ":rest":
                         result = nodes.slice(1);
                         break;
                     default:
-                        error('ADsafe: Query violation: :' + selector.op);
+                        error("ADsafe: Query violation: :" + selector.op);
                     }
                 } else {
 
@@ -619,12 +619,12 @@ ADSAFE = (function () {
     function make_root(root, id) {
 
         if (id) {
-            if (root.tagName !== 'DIV') {
-                error('ADsafe: Bad node.');
+            if (root.tagName !== "DIV") {
+                error("ADsafe: Bad node.");
             }
         } else {
-            if (root.tagName !== 'BODY') {
-                error('ADsafe: Bad node.');
+            if (root.tagName !== "BODY") {
+                error("ADsafe: Bad node.");
             }
         }
 
@@ -658,44 +658,44 @@ ADSAFE = (function () {
 // When a widget has focus, it can use the focus method.
 
             switch (type) {
-            case 'mousedown':
+            case "mousedown":
                 allow_focus = true;
                 if (document.selection) {
                     the_range = document.selection.createRange();
                 }
                 break;
-            case 'focus':
-            case 'focusin':
+            case "focus":
+            case "focusin":
                 allow_focus = true;
                 has_focus = the_target;
                 the_actual_event.cancelBubble = false;
-                type = 'focus';
+                type = "focus";
                 break;
-            case 'blur':
-            case 'focusout':
+            case "blur":
+            case "focusout":
                 allow_focus = false;
                 has_focus = null;
-                type = 'blur';
+                type = "blur";
                 break;
-            case 'keypress':
+            case "keypress":
                 allow_focus = true;
                 has_focus = the_target;
                 key = String.fromCharCode(the_actual_event.charCode ||
                         the_actual_event.keyCode);
                 switch (key) {
-                case '\u000d':
-                case '\u000a':
-                    type = 'enterkey';
+                case "\u000d":
+                case "\u000a":
+                    type = "enterkey";
                     break;
-                case '\u001b':
-                    type = 'escapekey';
+                case "\u001b":
+                    type = "escapekey";
                     break;
                 }
                 break;
 
 // This is a workaround for Safari.
 
-            case 'click':
+            case "click":
                 allow_focus = true;
                 break;
             }
@@ -722,8 +722,8 @@ ADSAFE = (function () {
 
 // If that node has an event handler, fire it. Otherwise, bubble up.
 
-                        if (b['___ on ___'] &&
-                                b['___ on ___'][type]) {
+                        if (b["___ on ___"] &&
+                                b["___ on ___"][type]) {
                             that.fire(the_event);
                         } else {
                             the_event.bubble();
@@ -749,8 +749,8 @@ ADSAFE = (function () {
 
 // If the target has event handlers, then fire them. Otherwise, bubble up.
 
-            if (the_target['___ on ___'] &&
-                    the_target['___ on ___'][the_event.type]) {
+            if (the_target["___ on ___"] &&
+                    the_target["___ on ___"][the_event.type]) {
                 target.fire(the_event);
             } else {
                 while (true) {
@@ -758,19 +758,19 @@ ADSAFE = (function () {
                     if (!the_target) {
                         break;
                     }
-                    if (the_target['___ on ___'] &&
-                            the_target['___ on ___'][the_event.type]) {
+                    if (the_target["___ on ___"] &&
+                            the_target["___ on ___"][the_event.type]) {
                         that = new Bunch([the_target]);
                         the_event.that = that;
                         that.fire(the_event);
                         break;
                     }
-                    if (the_target['___adsafe root___']) {
+                    if (the_target["___adsafe root___"]) {
                         break;
                     }
                 }
             }
-            if (the_event.type === 'escapekey') {
+            if (the_event.type === "escapekey") {
                 if (ephemeral) {
                     ephemeral.remove();
                 }
@@ -786,7 +786,7 @@ ADSAFE = (function () {
 // Mark the node as a root. This prevents event bubbling from propagating
 // past it.
 
-        root['___adsafe root___'] = '___adsafe root___';
+        root["___adsafe root___"] = "___adsafe root___";
 
         Bunch.prototype = {
             append: function (appendage) {
@@ -802,7 +802,7 @@ ADSAFE = (function () {
                 }
                 if (Array.isArray(appendage)) {
                     if (appendage.length !== b.length) {
-                        error('ADsafe: Array length: ' + b.length + '-' +
+                        error("ADsafe: Array length: " + b.length + "-" +
                                 value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
@@ -812,7 +812,7 @@ ADSAFE = (function () {
                         }
                     }
                 } else {
-                    if (typeof appendage !== 'string') {
+                    if (typeof appendage !== "string") {
                         rep = appendage.___nodes___;
                     }
                     for (i = 0; i < b.length; i += 1) {
@@ -852,7 +852,7 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error('ADsafe: Array length: ' + b.length + '-' +
+                        error("ADsafe: Array length: " + b.length + "-" +
                                 value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
@@ -871,19 +871,19 @@ ADSAFE = (function () {
                 }
                 return this;
             },
-            'class': function (value) {
+            "class": function (value) {
                 reject_global(this);
                 var b = this.___nodes___;
                 var i;
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error('ADsafe: Array length: ' + b.length + '-' +
+                        error("ADsafe: Array length: " + b.length + "-" +
                                 value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         if (/url/i.test(string_check(value[i]))) {
-                            error('ADsafe error.');
+                            error("ADsafe error.");
                         }
                         node = b[i];
                         if (node.tagName) {
@@ -892,7 +892,7 @@ ADSAFE = (function () {
                     }
                 } else {
                     if (/url/i.test(string_check(value))) {
-                        error('ADsafe error.');
+                        error("ADsafe error.");
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -929,7 +929,7 @@ ADSAFE = (function () {
                 reject_global(this);
                 var b = this.___nodes___;
                 var i;
-                if (typeof func === 'function') {
+                if (typeof func === "function") {
                     for (i = 0; i < b.length; i += 1) {
                         func(new Bunch([b[i]]));
                     }
@@ -944,7 +944,7 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error('ADsafe: Array length: ' + b.length + '-' +
+                        error("ADsafe: Array length: " + b.length + "-" +
                                 value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
@@ -972,7 +972,7 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(enable)) {
                     if (enable.length !== b.length) {
-                        error('ADsafe: Array length: ' + b.length + '-' +
+                        error("ADsafe: Array length: " + b.length + "-" +
                                 enable.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
@@ -1014,7 +1014,7 @@ ADSAFE = (function () {
     // Fire an event on an object. The event can be either
     // a string containing the name of the event, or an
     // object containing a type property containing the
-    // name of the event. Handlers registered by the 'on'
+    // name of the event. Handlers registered by the "on"
     // method that match the event name will be invoked.
 
                 reject_global(this);
@@ -1027,10 +1027,10 @@ ADSAFE = (function () {
                 var on;
                 var type;
 
-                if (typeof event === 'string') {
+                if (typeof event === "string") {
                     type = event;
                     event = {type: type};
-                } else if (typeof event === 'object') {
+                } else if (typeof event === "object") {
                     type = event.type;
                 } else {
                     error();
@@ -1039,7 +1039,7 @@ ADSAFE = (function () {
                 n = b.length;
                 for (i = 0; i < n; i += 1) {
                     node = b[i];
-                    on = node['___ on ___'];
+                    on = node["___ on ___"];
 
     // If an array of handlers exist for this event, then
     // loop through it and execute the handlers in order.
@@ -1104,7 +1104,7 @@ ADSAFE = (function () {
                 var b = this.___nodes___;
                 var i;
                 for (i = 0; i < b.length; i += 1) {
-                    a[i] = b[i]['_adsafe mark_'];
+                    a[i] = b[i]["_adsafe mark_"];
                 }
                 return a;
             },
@@ -1155,8 +1155,8 @@ ADSAFE = (function () {
                 var n;
                 for (i = 0; i < b.length; i += 1) {
                     n = b[i].parentNode;
-                    if (n['___adsafe root___']) {
-                        error('ADsafe parent violation.');
+                    if (n["___adsafe root___"]) {
+                        error("ADsafe parent violation.");
                     }
                     a[i] = n;
                 }
@@ -1171,13 +1171,13 @@ ADSAFE = (function () {
                 var range;
                 if (b.length === 1 && allow_focus) {
                     node = b[0];
-                    if (typeof node.selectionStart === 'number') {
+                    if (typeof node.selectionStart === "number") {
                         start = node.selectionStart;
                         end = node.selectionEnd;
                         return node.value.slice(start, end);
                     }
                     range = node.createTextRange();
-                    range.expand('textedit');
+                    range.expand("textedit");
                     if (range.inRange(the_range)) {
                         return the_range.text;
                     }
@@ -1200,11 +1200,11 @@ ADSAFE = (function () {
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
                     if (node.tagName) {
-                        s = (name !== 'float')
+                        s = (name !== "float")
                             ? getStyleObject(node)[name]
                             : getStyleObject(node).cssFloat ||
                                     getStyleObject(node).styleFloat;
-                        if (typeof s === 'string') {
+                        if (typeof s === "string") {
                             a[i] = s;
                         }
                     }
@@ -1222,7 +1222,7 @@ ADSAFE = (function () {
                 var tagName;
                 for (i = 0; i < b.length; i += 1) {
                     tagName = b[i].tagName;
-                    a[i] = (typeof tagName === 'string')
+                    a[i] = (typeof tagName === "string")
                         ? tagName.toLowerCase()
                         : tagName;
                 }
@@ -1252,12 +1252,12 @@ ADSAFE = (function () {
                 var node;
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
-                    if (node.nodeName === '#text') {
+                    if (node.nodeName === "#text") {
                         a[i] = node.nodeValue;
-                    } else if (node.tagName && node.type !== 'password') {
+                    } else if (node.tagName && node.type !== "password") {
                         a[i] = node.value;
                         if (!a[i] && node.firstChild &&
-                                node.firstChild.nodeName === '#text') {
+                                node.firstChild.nodeName === "#text") {
                             a[i] = node.firstChild.nodeValue;
                         }
                     }
@@ -1271,7 +1271,7 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error('ADsafe: Array length: ' + b.length + '-' +
+                        error("ADsafe: Array length: " + b.length + "-" +
                                 value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
@@ -1300,20 +1300,20 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error('ADsafe: Array length: ' + b.length + '-' +
+                        error("ADsafe: Array length: " + b.length + "-" +
                                 value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         if (node.tagName) {
-                            node['_adsafe mark_'] = String(value[i]);
+                            node["_adsafe mark_"] = String(value[i]);
                         }
                     }
                 } else {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         if (node.tagName) {
-                            node['_adsafe mark_'] = String(value);
+                            node["_adsafe mark_"] = String(value);
                         }
                     }
                 }
@@ -1326,19 +1326,19 @@ ADSAFE = (function () {
                 var node;
                 for (i = 0; i < b.length; i += 1) {
                     node = b[i];
-                    if (typeof type === 'string') {
-                        if (typeof node['___ on ___'] === 'object') {
-                            node['___ on ___'][type] = null;
+                    if (typeof type === "string") {
+                        if (typeof node["___ on ___"] === "object") {
+                            node["___ on ___"][type] = null;
                         }
                     } else {
-                        node['___ on ___'] = null;
+                        node["___ on ___"] = null;
                     }
                 }
                 return this;
             },
             on: function (type, func) {
                 reject_global(this);
-                if (typeof type !== 'string' || typeof func !== 'function') {
+                if (typeof type !== "string" || typeof func !== "function") {
                     error();
                 }
 
@@ -1353,8 +1353,8 @@ ADSAFE = (function () {
 // The change event does not propogate, so we must put the handler on the
 // instance.
 
-                    if (type === 'change') {
-                        ontype = 'on' + type;
+                    if (type === "change") {
+                        ontype = "on" + type;
                         if (node[ontype] !== dom_event) {
                             node[ontype] = dom_event;
                         }
@@ -1363,10 +1363,10 @@ ADSAFE = (function () {
 // Register an event. Put the function in a handler array, making one if it
 // doesn't yet exist for this type on this node.
 
-                    on = node['___ on ___'];
+                    on = node["___ on ___"];
                     if (!on) {
                         on = {};
-                        node['___ on ___'] = on;
+                        node["___ on ___"] = on;
                     }
                     if (owns(on, type)) {
                         on[type].push(func);
@@ -1381,7 +1381,7 @@ ADSAFE = (function () {
                 var b = this.___nodes___;
                 var i;
                 for (i = 0; i < b.length; i += 1) {
-                    b[i]['___adsafe root___'] = '___adsafe root___';
+                    b[i]["___adsafe root___"] = "___adsafe root___";
                 }
                 return this;
             },
@@ -1423,8 +1423,8 @@ ADSAFE = (function () {
                     }
                 } else if (Array.isArray(replacement)) {
                     if (replacement.length !== b.length) {
-                        error('ADsafe: Array length: ' +
-                                b.length + '-' + value.length);
+                        error("ADsafe: Array length: " +
+                                b.length + "-" + value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1490,7 +1490,7 @@ ADSAFE = (function () {
                 var range;
                 if (b.length === 1 && allow_focus) {
                     node = b[0];
-                    if (typeof node.selectionStart === 'number') {
+                    if (typeof node.selectionStart === "number") {
                         start = node.selectionStart;
                         end = node.selectionEnd;
                         old = node.value;
@@ -1500,7 +1500,7 @@ ADSAFE = (function () {
                         node.focus();
                     } else {
                         range = node.createTextRange();
-                        range.expand('textedit');
+                        range.expand("textedit");
                         if (range.inRange(the_range)) {
                             the_range.select();
                             the_range.text = string;
@@ -1524,8 +1524,8 @@ ADSAFE = (function () {
                 var v;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error('ADsafe: Array length: ' +
-                                b.length + '-' + value.length);
+                        error("ADsafe: Array length: " +
+                                b.length + "-" + value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1534,7 +1534,7 @@ ADSAFE = (function () {
                             error();
                         }
                         if (node.tagName) {
-                            if (name !== 'float') {
+                            if (name !== "float") {
                                 node.style[name] = v;
                             } else {
                                 node.style.cssFloat = v;
@@ -1550,7 +1550,7 @@ ADSAFE = (function () {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         if (node.tagName) {
-                            if (name !== 'float') {
+                            if (name !== "float") {
                                 node.style[name] = v;
                             } else {
                                 node.style.cssFloat = v;
@@ -1564,15 +1564,15 @@ ADSAFE = (function () {
             tag: function (tag, type, name) {
                 reject_global(this);
                 var node;
-                if (typeof tag !== 'string') {
+                if (typeof tag !== "string") {
                     error();
                 }
                 if (makeableTagName[tag] !== true) {
-                    error('ADsafe: Bad tag: ' + tag);
+                    error("ADsafe: Bad tag: " + tag);
                 }
                 node = document.createElement(tag);
                 if (name) {
-                    node.autocomplete = 'off';
+                    node.autocomplete = "off";
                     node.name = string_check(name);
                 }
                 if (type) {
@@ -1600,8 +1600,8 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error('ADsafe: Array length: ' + b.length +
-                                '-' + value.length);
+                        error("ADsafe: Array length: " + b.length +
+                                "-" + value.length);
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1632,8 +1632,8 @@ ADSAFE = (function () {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         if (node.tagName) {
-                            if (node.type !== 'password') {
-                                if (typeof node.value === 'string') {
+                            if (node.type !== "password") {
+                                if (typeof node.value === "string") {
                                     node.value = value[i];
                                 } else {
                                     while (node.firstChild) {
@@ -1645,7 +1645,7 @@ ADSAFE = (function () {
                                     ));
                                 }
                             }
-                        } else if (node.nodeName === '#text') {
+                        } else if (node.nodeName === "#text") {
                             node.nodeValue = String(value[i]);
                         }
                     }
@@ -1654,8 +1654,8 @@ ADSAFE = (function () {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         if (node.tagName) {
-                            if (node.tagName !== 'BUTTON' &&
-                                    typeof node.value === 'string') {
+                            if (node.tagName !== "BUTTON" &&
+                                    typeof node.value === "string") {
                                 node.value = value;
                             } else {
                                 while (node.firstChild) {
@@ -1664,7 +1664,7 @@ ADSAFE = (function () {
                                 }
                                 node.appendChild(document.createTextNode(value));
                             }
-                        } else if (node.nodeName === '#text') {
+                        } else if (node.nodeName === "#text") {
                             node.nodeValue = value;
                         }
                     }
@@ -1677,14 +1677,14 @@ ADSAFE = (function () {
 
         dom = {
             append: function (bunch) {
-                var b = (typeof bunch === 'string')
+                var b = (typeof bunch === "string")
                     ? [document.createTextNode(bunch)]
                     : bunch.___nodes___;
                 var i;
                 var n;
                 for (i = 0; i < b.length; i += 1) {
                     n = b[i];
-                    if (typeof n === 'string' || typeof n === 'number') {
+                    if (typeof n === "string" || typeof n === "number") {
                         n = document.createTextNode(String(n));
                     }
                     root.appendChild(n);
@@ -1693,7 +1693,7 @@ ADSAFE = (function () {
             },
             combine: function (array) {
                 if (!array || !array.length) {
-                    error('ADsafe: Bad combination.');
+                    error("ADsafe: Bad combination.");
                 }
                 var b = array[0].___nodes___;
                 var i;
@@ -1726,8 +1726,8 @@ ADSAFE = (function () {
             q: function (text) {
                 star = false;
                 var query = parse_query(text, id);
-                if (typeof hunter[query[0].op] !== 'function') {
-                    error('ADsafe: Bad query: ' + query[0]);
+                if (typeof hunter[query[0].op] !== "function") {
+                    error("ADsafe: Bad query: " + query[0]);
                 }
                 return new Bunch(quest(query, [root]));
             },
@@ -1737,11 +1737,11 @@ ADSAFE = (function () {
                 root = null;
             },
             row: function (values) {
-                var tr = document.createElement('tr');
+                var tr = document.createElement("tr");
                 var td;
                 var i;
                 for (i = 0; i < values.length; i += 1) {
-                    td = document.createElement('td');
+                    td = document.createElement("td");
                     td.appendChild(document.createTextNode(String(values[i])));
                     tr.appendChild(td);
                 }
@@ -1749,15 +1749,15 @@ ADSAFE = (function () {
             },
             tag: function (tag, type, name) {
                 var node;
-                if (typeof tag !== 'string') {
+                if (typeof tag !== "string") {
                     error();
                 }
                 if (makeableTagName[tag] !== true) {
-                    error('ADsafe: Bad tag: ' + tag);
+                    error("ADsafe: Bad tag: " + tag);
                 }
                 node = document.createElement(tag);
                 if (name) {
-                    node.autocomplete = 'off';
+                    node.autocomplete = "off";
                     node.name = name;
                 }
                 if (type) {
@@ -1779,17 +1779,17 @@ ADSAFE = (function () {
             }
         };
 
-        if (typeof root.addEventListener === 'function') {
-            root.addEventListener('focus', dom_event, true);
-            root.addEventListener('blur', dom_event, true);
-            root.addEventListener('mouseover', dom_event, true);
-            root.addEventListener('mouseout', dom_event, true);
-            root.addEventListener('mouseup', dom_event, true);
-            root.addEventListener('mousedown', dom_event, true);
-            root.addEventListener('mousemove', dom_event, true);
-            root.addEventListener('click', dom_event, true);
-            root.addEventListener('dblclick', dom_event, true);
-            root.addEventListener('keypress', dom_event, true);
+        if (typeof root.addEventListener === "function") {
+            root.addEventListener("focus", dom_event, true);
+            root.addEventListener("blur", dom_event, true);
+            root.addEventListener("mouseover", dom_event, true);
+            root.addEventListener("mouseout", dom_event, true);
+            root.addEventListener("mouseup", dom_event, true);
+            root.addEventListener("mousedown", dom_event, true);
+            root.addEventListener("mousemove", dom_event, true);
+            root.addEventListener("click", dom_event, true);
+            root.addEventListener("dblclick", dom_event, true);
+            root.addEventListener("keypress", dom_event, true);
         } else {
             root.onclick = dom_event;
             root.ondblclick = dom_event;
@@ -1844,7 +1844,7 @@ ADSAFE = (function () {
 //  Get the dom node for the widget's div container.
 
             root = document.getElementById(id);
-            if (root.tagName !== 'DIV') {
+            if (root.tagName !== "DIV") {
                 error();
             }
             adsafe_id = null;
@@ -1854,7 +1854,7 @@ ADSAFE = (function () {
 //  This provides some protection against mishaps due to weakness in the
 //  document.getElementById function.
 
-            scripts = root.getElementsByTagName('script');
+            scripts = root.getElementsByTagName("script");
             i = scripts.length - 1;
             if (i < 0) {
                 error();
@@ -1870,7 +1870,7 @@ ADSAFE = (function () {
 
             for (i = 0; i < interceptors.length; i += 1) {
                 fun = interceptors[i];
-                if (typeof fun === 'function') {
+                if (typeof fun === "function") {
                     try {
                         fun(id, dom, adsafe_lib, root[1]);
                     } catch (e1) {
@@ -1915,7 +1915,7 @@ ADSAFE = (function () {
 //  ADSAFE.isArray returns true if the operand is an array.
 
         isArray: Array.isArray || function (value) {
-            return Object.prototype.toString.apply(value) === '[object Array]';
+            return Object.prototype.toString.apply(value) === "[object Array]";
         },
 
 //  ADSAFE.keys returns an array of keys.
@@ -1925,7 +1925,7 @@ ADSAFE = (function () {
 //  ADSAFE.later calls a function at a later time.
 
         later: function (func, timeout) {
-            if (typeof func === 'function') {
+            if (typeof func === "function") {
                 setTimeout(func, timeout || 0);
             } else {
                 error();
@@ -1949,7 +1949,7 @@ ADSAFE = (function () {
         log: function log(s) {
             if (window.console) {
                 console.log(s);
-            } else if (typeof Debug === 'object') {
+            } else if (typeof Debug === "object") {
                 Debug.writeln(s);      /* IE */
             } else {
                 opera.postError(s);    /* Opera */
