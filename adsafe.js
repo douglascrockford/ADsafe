@@ -1,5 +1,5 @@
 // adsafe.js
-// 2016-02-07
+// 2017-06-12
 
 //    Public Domain.
 
@@ -201,8 +201,11 @@ ADSAFE = (function () {
 //    the owns function.
 
     function owns(object, string) {
-        return object && typeof object === "object" &&
-                Object.prototype.hasOwnProperty.call(object, string_check(string));
+        return (
+            object
+            && typeof object === "object"
+            && Object.prototype.hasOwnProperty.call(object, string_check(string))
+        );
     }
 
 //  The reject functions enforce the restriction on property names.
@@ -211,8 +214,15 @@ ADSAFE = (function () {
 //  or strings that start or end with _.
 
     function reject_name(name) {
-        return typeof name !== "number" && (typeof name !== "string" ||
-                banned[name] || name.charAt(0) === "_" || name.slice(-1) === "_");
+        return (
+            typeof name !== "number"
+            && (
+                typeof name !== "string"
+                || banned[name]
+                || name.charAt(0) === "_"
+                || name.slice(-1) === "_"
+            )
+        );
     }
 
 
@@ -236,8 +246,10 @@ ADSAFE = (function () {
             return cache_style_object;
         }
         cache_style_node = node;
-        cache_style_object =
-                node.currentStyle || defaultView.getComputedStyle(node, "");
+        cache_style_object = (
+            node.currentStyle
+            || defaultView.getComputedStyle(node, "")
+        );
         return cache_style_object;
     }
 
@@ -291,8 +303,8 @@ ADSAFE = (function () {
         var query = [];     // The resulting query array
         var selector;
         var qx = (id)
-            ? /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~\|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/
-            : /^\s*(?:([\*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~\|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>\+]?)\s*([a-z][0-9a-z\-]*))\s*/;
+            ? /^\s*(?:([*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([A-Z]+_[A-Z0-9]+)|:\s*([a-z]+)|([.&_>+]?)\s*([a-z][0-9a-z\-]*))\s*/
+            : /^\s*(?:([*\/])|\[\s*([a-z][0-9a-z_\-]*)\s*(?:([!*~|$\^]?=)\s*([0-9A-Za-z_\-*%&;.\/:!]+)\s*)?\]|#\s*([\-A-Za-z0-9_]+)|:\s*([a-z]+)|([.&_>+]?)\s*([a-z][0-9a-z\-]*))\s*/;
 
 // Loop over all of the selectors in the text.
 
@@ -343,8 +355,11 @@ ADSAFE = (function () {
 
 // The selector is an id.
 
-                if (query.length > 0 || match[5].length <= id.length ||
-                        match[5].slice(0, id.length) !== id) {
+                if (
+                    query.length > 0
+                    || match[5].length <= id.length
+                    || match[5].slice(0, id.length) !== id
+                ) {
                     error("ADsafe: Bad query: " + text);
                 }
                 selector = {
@@ -571,8 +586,11 @@ ADSAFE = (function () {
 
             if (typeof func === "function") {
                 if (star) {
-                    error("ADsafe: Query violation: *" + selector.op +
-                            (selector.name || ""));
+                    error(
+                        "ADsafe: Query violation: *"
+                        + selector.op
+                        + (selector.name || "")
+                    );
                 }
                 result = [];
                 for (j = 0; j < nodes.length; j += 1) {
@@ -680,8 +698,9 @@ ADSAFE = (function () {
             case "keypress":
                 allow_focus = true;
                 has_focus = the_target;
-                key = String.fromCharCode(the_actual_event.charCode ||
-                        the_actual_event.keyCode);
+                key = String.fromCharCode(
+                    the_actual_event.charCode || the_actual_event.keyCode
+                );
                 switch (key) {
                 case "\u000d":
                 case "\u000a":
@@ -699,8 +718,10 @@ ADSAFE = (function () {
                 allow_focus = true;
                 break;
             }
-            if (the_actual_event.cancelBubble &&
-                    the_actual_event.stopPropagation) {
+            if (
+                the_actual_event.cancelBubble
+                && the_actual_event.stopPropagation
+            ) {
                 the_actual_event.stopPropagation();
             }
 
@@ -722,8 +743,9 @@ ADSAFE = (function () {
 
 // If that node has an event handler, fire it. Otherwise, bubble up.
 
-                        if (b["___ on ___"] &&
-                                b["___ on ___"][type]) {
+                        if (
+                            b["___ on ___"] && b["___ on ___"][type]
+                        ) {
                             that.fire(the_event);
                         } else {
                             the_event.bubble();
@@ -749,8 +771,10 @@ ADSAFE = (function () {
 
 // If the target has event handlers, then fire them. Otherwise, bubble up.
 
-            if (the_target["___ on ___"] &&
-                    the_target["___ on ___"][the_event.type]) {
+            if (
+                the_target["___ on ___"]
+                && the_target["___ on ___"][the_event.type]
+            ) {
                 target.fire(the_event);
             } else {
                 while (true) {
@@ -758,8 +782,10 @@ ADSAFE = (function () {
                     if (!the_target) {
                         break;
                     }
-                    if (the_target["___ on ___"] &&
-                            the_target["___ on ___"][the_event.type]) {
+                    if (
+                        the_target["___ on ___"]
+                        && the_target["___ on ___"][the_event.type]
+                    ) {
                         that = new Bunch([the_target]);
                         the_event.that = that;
                         that.fire(the_event);
@@ -802,8 +828,11 @@ ADSAFE = (function () {
                 }
                 if (Array.isArray(appendage)) {
                     if (appendage.length !== b.length) {
-                        error("ADsafe: Array length: " + b.length + "-" +
-                                value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         rep = appendage[i].___nodes___;
@@ -852,8 +881,11 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error("ADsafe: Array length: " + b.length + "-" +
-                                value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -878,8 +910,11 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error("ADsafe: Array length: " + b.length + "-" +
-                                value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         if (/url/i.test(string_check(value[i]))) {
@@ -944,8 +979,12 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error("ADsafe: Array length: " + b.length + "-" +
-                                value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length
+                            + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -972,8 +1011,11 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(enable)) {
                     if (enable.length !== b.length) {
-                        error("ADsafe: Array length: " + b.length + "-" +
-                                enable.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length + "-"
+                            + enable.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1202,8 +1244,8 @@ ADSAFE = (function () {
                     if (node.tagName) {
                         s = (name !== "float")
                             ? getStyleObject(node)[name]
-                            : getStyleObject(node).cssFloat ||
-                                    getStyleObject(node).styleFloat;
+                            : getStyleObject(node).cssFloat
+                                    || getStyleObject(node).styleFloat;
                         if (typeof s === "string") {
                             a[i] = s;
                         }
@@ -1256,8 +1298,11 @@ ADSAFE = (function () {
                         a[i] = node.nodeValue;
                     } else if (node.tagName && node.type !== "password") {
                         a[i] = node.value;
-                        if (!a[i] && node.firstChild &&
-                                node.firstChild.nodeName === "#text") {
+                        if (
+                            !a[i]
+                            && node.firstChild
+                            && node.firstChild.nodeName === "#text"
+                        ) {
                             a[i] = node.firstChild.nodeValue;
                         }
                     }
@@ -1271,8 +1316,12 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error("ADsafe: Array length: " + b.length + "-" +
-                                value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length
+                            + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1300,8 +1349,12 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error("ADsafe: Array length: " + b.length + "-" +
-                                value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length
+                            + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1388,8 +1441,9 @@ ADSAFE = (function () {
             q: function (text) {
                 reject_global(this);
                 star = this.___star___;
-                return new Bunch(quest(parse_query(string_check(text), id),
-                        this.___nodes___));
+                return new Bunch(
+                    quest(parse_query(string_check(text), id), this.___nodes___)
+                );
             },
             remove: function () {
                 reject_global(this);
@@ -1411,9 +1465,13 @@ ADSAFE = (function () {
                 for (i = 0; i < b.length; i += 1) {
                     purge_event_handlers(b[i]);
                 }
-                if (!replacement || replacement.length === 0 ||
-                        (replacement.___nodes___ &&
-                        replacement.___nodes___.length === 0)) {
+                if (
+                    !replacement || replacement.length === 0
+                    || (
+                        replacement.___nodes___
+                        && replacement.___nodes___.length === 0
+                    )
+                ) {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         purge_event_handlers(node);
@@ -1423,8 +1481,12 @@ ADSAFE = (function () {
                     }
                 } else if (Array.isArray(replacement)) {
                     if (replacement.length !== b.length) {
-                        error("ADsafe: Array length: " +
-                                b.length + "-" + value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length
+                            + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1524,8 +1586,12 @@ ADSAFE = (function () {
                 var v;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error("ADsafe: Array length: " +
-                                b.length + "-" + value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length
+                            + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1600,8 +1666,12 @@ ADSAFE = (function () {
                 var node;
                 if (Array.isArray(value)) {
                     if (value.length !== b.length) {
-                        error("ADsafe: Array length: " + b.length +
-                                "-" + value.length);
+                        error(
+                            "ADsafe: Array length: "
+                            + b.length
+                            + "-"
+                            + value.length
+                        );
                     }
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
@@ -1654,8 +1724,10 @@ ADSAFE = (function () {
                     for (i = 0; i < b.length; i += 1) {
                         node = b[i];
                         if (node.tagName) {
-                            if (node.tagName !== "BUTTON" &&
-                                    typeof node.value === "string") {
+                            if (
+                                node.tagName !== "BUTTON"
+                                && typeof node.value === "string"
+                            ) {
                                 node.value = value;
                             } else {
                                 while (node.firstChild) {
